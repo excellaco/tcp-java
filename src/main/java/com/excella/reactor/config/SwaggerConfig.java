@@ -15,15 +15,14 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 @Configuration
 @EnableSwagger2
 public class SwaggerConfig {
-    @Bean
-    public Docket api() {
-        return new Docket(DocumentationType.SWAGGER_2)
-                .select()
-                .apis(RequestHandlerSelectors.any())
-                .paths(Predicates.not(PathSelectors.regex("/error")))
-                .build()
-                .genericModelSubstitutes(ResponseEntity.class, Mono.class)
-                .genericModelSubstitutes(ResponseEntity.class, Flux.class);
-    }
+  @Bean
+  public Docket api() {
+    return new Docket(DocumentationType.SWAGGER_2)
+        .select()
+        .apis(RequestHandlerSelectors.any())
+        .paths(Predicates.not(PathSelectors.regex("/error")))
+        .build()
+        .genericModelSubstitutes(ResponseEntity.class, Mono.class)
+        .genericModelSubstitutes(ResponseEntity.class, Flux.class);
+  }
 }
-

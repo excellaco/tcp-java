@@ -1,10 +1,11 @@
 package com.excella.reactor.common.exceptions;
 
 public class BookNotFoundException extends RuntimeException {
-    public BookNotFoundException(String message) {
-        super(message);
-    }
-    public static BookNotFoundException of(String message) {
-        return new BookNotFoundException(message);
-    }
+  public BookNotFoundException(String message) {
+    super(message);
+  }
+
+  public static BookNotFoundException of(String message) {
+    return new BookNotFoundException(message);
+  }
 }

@@ -9,15 +9,11 @@ import org.springframework.data.annotation.Id;
 @Value
 @Builder
 public class Book {
-    @NonFinal
-    @Id
-    private Long id;
+  @NonFinal @Id private Long id;
 
-    @NonNull
-    private String title;
+  @NonNull private String title;
 
-    @NonNull
-    private String author;
+  @NonNull private String author;
 
-    private int yearPublished;
+  private int yearPublished;
 }

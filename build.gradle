@@ -1,11 +1,13 @@
 plugins {
-	id 'org.springframework.boot' version '2.1.4.RELEASE'
+	id 'org.springframework.boot' version '2.1.5.RELEASE'
 	id "io.franzbecker.gradle-lombok" version '3.0.0'
+	id 'com.github.sherter.google-java-format' version '0.8'
 	id 'java'
 }
 
 apply plugin: 'io.spring.dependency-management'
 apply plugin: 'io.franzbecker.gradle-lombok'
+
 
 group = 'com.excella'
 version = '0.0.1-SNAPSHOT'
