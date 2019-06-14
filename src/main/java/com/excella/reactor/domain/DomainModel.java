@@ -12,7 +12,9 @@ import javax.persistence.MappedSuperclass;
 @Getter
 @Setter
 @MappedSuperclass
-public abstract class DomainModel  {
-  @GeneratedValue(strategy= GenerationType.IDENTITY)
-  @NonFinal @Id protected Long id;
+public abstract class DomainModel {
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  @NonFinal
+  @Id
+  protected Long id;
 }

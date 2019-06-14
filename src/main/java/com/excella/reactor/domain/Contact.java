@@ -3,7 +3,6 @@ package com.excella.reactor.domain;
 import java.io.Serializable;
 import javax.persistence.Embeddable;
 import javax.persistence.Embedded;
-
 import lombok.Data;
 
 @Data
@@ -11,6 +10,5 @@ import lombok.Data;
 public class Contact implements Serializable {
   private String email;
   private String phoneNumber;
-  @Embedded
-  private Address address;
+  @Embedded private Address address;
 }
