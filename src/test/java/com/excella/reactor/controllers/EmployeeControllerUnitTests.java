@@ -24,10 +24,11 @@ public class EmployeeControllerUnitTests {
 
   @Test
   public void getAll_can_return_flux_of_multiple_employees() {
-    when(mockService.all()).thenReturn(Flux.just(mockEmployee1, mockEmployee2, mockEmployee3));
+    var expectedEmployees = Arrays.asList(mockEmployee1, mockEmployee2, mockEmployee3);
+    when(mockService.all()).thenReturn(Flux.fromIterable(expectedEmployees));
 
     StepVerifier.create(mockService.all())
-        .expectNextSequence(Arrays.asList(mockEmployee1, mockEmployee2, mockEmployee3))
+        .expectNextSequence(expectedEmployees)
         .expectComplete()
         .verify();
   }
