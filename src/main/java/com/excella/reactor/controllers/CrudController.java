@@ -37,7 +37,7 @@ public abstract class CrudController<T extends DomainModel> {
   }
 
   @PutMapping(value = "/{id}", name = "Update a resource by id", produces = "application/json")
-  Publisher<T> update(@PathVariable Long id, @Validated T t) {
+  Publisher<T> update(@PathVariable Long id, @RequestBody @Validated T t) {
     return getService().update(id, t).doOnSubscribe(result -> log.info("Updating item {}", id));
   }
 
