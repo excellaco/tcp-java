@@ -1,3 +1,2 @@
-docker-compose down
 docker-compose run -p 8080:8080 api /app/gradlew $@ 
 

@@ -1,9 +1,8 @@
 package com.excella.reactor.domain;
 
-import lombok.Data;
-
 import javax.persistence.Embeddable;
 import javax.validation.constraints.Size;
+import lombok.Data;
 
 @Data
 @Embeddable
