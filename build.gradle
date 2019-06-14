@@ -2,12 +2,12 @@ plugins {
 	id 'org.springframework.boot' version '2.1.5.RELEASE'
 	id "io.franzbecker.gradle-lombok" version '3.0.0'
 	id 'com.github.sherter.google-java-format' version '0.8'
+	id 'jacoco'
 	id 'java'
 }
 
 apply plugin: 'io.spring.dependency-management'
 apply plugin: 'io.franzbecker.gradle-lombok'
-
 
 group = 'com.excella'
 version = '0.0.1-SNAPSHOT'
@@ -24,6 +24,28 @@ configurations {
 	}
 }
 
+jacoco {
+	toolVersion = "0.8.3"
+	reportsDir = file("$buildDir/jacocoReportDir")
+}
+
+jacocoTestReport {
+	reports {
+		xml.enabled false
+		csv.enabled false
+		html.destination file("${buildDir}/jacocoHtml")
+	}
+}
+
+jacocoTestCoverageVerification {
+	violationRules {
+		rule {
+			limit {
+				minimum = 0.0
+			}
+		}
+	}
+}
 
 repositories {
 	mavenCentral()
@@ -58,3 +80,13 @@ dependencies {
 	testImplementation 'org.mockito:mockito-inline:2.13.0'
 }
 
+task testNG(type: Test) {
+	useTestNG()
+	jacoco {
+		destinationFile = file("$buildDir/jacoco/test.exec")
+	}
+}
+
+test {
+	dependsOn testNG
+}
