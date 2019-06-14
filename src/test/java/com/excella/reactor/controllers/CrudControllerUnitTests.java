@@ -3,6 +3,8 @@ package com.excella.reactor.controllers;
 import com.excella.reactor.common.exceptions.ResourceNotFoundException;
 import com.excella.reactor.domain.DomainModel;
 import com.excella.reactor.service.CrudService;
+import java.util.Arrays;
+import javax.persistence.Entity;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -15,9 +17,6 @@ import org.testng.annotations.Test;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
-
-import javax.persistence.Entity;
-import java.util.Arrays;
 
 @Test
 public class CrudControllerUnitTests {
@@ -102,8 +101,7 @@ public class CrudControllerUnitTests {
         .expectNext(mockEntity1)
         .expectComplete()
         .verify();
-    Mockito.verify(mockService, Mockito.times(1))
-            .save(ArgumentMatchers.eq(mockEntity1));
+    Mockito.verify(mockService, Mockito.times(1)).save(ArgumentMatchers.eq(mockEntity1));
   }
 
   @Test
@@ -115,10 +113,14 @@ public class CrudControllerUnitTests {
         .verify();
 
     Mockito.verify(mockService, Mockito.times(1))
-            .update(ArgumentMatchers.eq(123L), ArgumentMatchers.eq(mockEntity2));
+        .update(ArgumentMatchers.eq(123L), ArgumentMatchers.eq(mockEntity2));
   }
 
-  private removeById_calls_delete_on_service_and_returns_deleted_item(){
-      Mockito.when(mockService.delete())
+  @Test
+  private void removeById_calls_delete_on_service_and_returns_deleted_item() {
+    Mockito.when(mockService.delete(123L)).thenReturn(Mono.just(mockEntity2));
+    StepVerifier.create(testController.removeById(123L)).expectNext(mockEntity2).verifyComplete();
+
+    Mockito.verify(mockService, Mockito.times(1)).delete(ArgumentMatchers.eq(123L));
   }
 }
