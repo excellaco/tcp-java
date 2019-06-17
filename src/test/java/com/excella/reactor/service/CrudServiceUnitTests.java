@@ -1,8 +1,9 @@
 package com.excella.reactor.service;
 
 import com.excella.reactor.shared.SampleEntity;
+import org.mockito.ArgumentMatchers;
 import org.mockito.Mockito;
-import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.repository.CrudRepository;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -15,12 +16,12 @@ import java.util.Optional;
 
 public class CrudServiceUnitTests {
 
-  JpaRepository<SampleEntity, Long> mockRepository;
+  private CrudRepository<SampleEntity, Long> mockRepository;
 
   private class SampleCrudService implements CrudService<SampleEntity> {
 
     @Override
-    public JpaRepository<SampleEntity, Long> getRepository() {
+    public CrudRepository<SampleEntity, Long> getRepository() {
       return mockRepository;
     }
   }
@@ -34,7 +35,7 @@ public class CrudServiceUnitTests {
   @BeforeMethod
   private void beforeEach() {
     sampleService = new SampleCrudService();
-    mockRepository = Mockito.mock(JpaRepository.class);
+    mockRepository = Mockito.mock(CrudRepository.class);
     sampleEntityList = Arrays.asList(sampleEntity1, sampleEntity2, sampleEntity3);
   }
 
@@ -52,11 +53,8 @@ public class CrudServiceUnitTests {
 
   @Test
   private void all_method_can_return_flux_with_multiple_entities() {
-    Mockito.when(mockRepository.findAll())
-        .thenReturn(sampleEntityList);
-    StepVerifier.create(sampleService.all())
-        .expectNextSequence(sampleEntityList)
-        .verifyComplete();
+    Mockito.when(mockRepository.findAll()).thenReturn(sampleEntityList);
+    StepVerifier.create(sampleService.all()).expectNextSequence(sampleEntityList).verifyComplete();
   }
 
   // byId
@@ -69,13 +67,42 @@ public class CrudServiceUnitTests {
 
   @Test
   private void byId_can_return_instance_when_one_found() {
-    Mockito.when(mockRepository.findById(Mockito.anyLong()))
-            .thenReturn();
+    Mockito.when(mockRepository.findById(Mockito.anyLong())).thenReturn(Optional.of(sampleEntity1));
+    StepVerifier.create(sampleService.byId(1234L)).expectNext(sampleEntity1).verifyComplete();
   }
   // save
+  @Test
+  private void save_returns_mono_of_saved_entity() {
+    Mockito.when(mockRepository.save(Mockito.any(SampleEntity.class))).thenReturn(sampleEntity1);
+    StepVerifier.create(sampleService.save(sampleEntity1))
+        .expectNext(sampleEntity1)
+        .verifyComplete();
+  }
 
   // update
+  @Test
+  private void update_returns_empty_mono_and_does_not_save_new_entity_when_no_matching_id_found() {
+    Mockito.when(mockRepository.save(Mockito.any())).thenReturn(sampleEntity1);
+    Mockito.when(mockRepository.findById(Mockito.any())).thenReturn(Optional.empty());
 
+    StepVerifier.create(sampleService.update(1234L, sampleEntity1)).verifyComplete();
+
+    Mockito.verify(mockRepository, Mockito.never()).save(ArgumentMatchers.any());
+  }
+
+  // failing on purpose temporarily (mockrepository.save should have sampleentity1 not sampleentity2)
+  @Test
+  private void update_returns_mono_with_updated_entity_and_saves_when_matching_id_found() {
+
+    Mockito.when(mockRepository.save(sampleEntity2)).thenReturn(sampleEntity1);
+    Mockito.when(mockRepository.findById(1234L)).thenReturn(Optional.of(sampleEntity1));
+
+    StepVerifier.create(sampleService.update(1234L, sampleEntity1))
+        .expectNext(sampleEntity1)
+        .verifyComplete();
+
+    Mockito.verify(mockRepository, Mockito.times(1)).save(ArgumentMatchers.eq(sampleEntity1));
+  }
   // delete
 
 }
