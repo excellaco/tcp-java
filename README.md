@@ -14,11 +14,13 @@ A CRUD example using Spring WebFlux and Java 11
 - Navigate to:
     > http://localhost:8080/api/swagger-ui.html
 
-- Running tests: `./start test`
+- Running tests: `./start testNG`
 
 - Run the linter: `./start verGJF`
 
 - Auto-fix linter warnings: `./start goJF`
+
+- Run linter + tests + test report: `./test` (coverage report is generated under `build/jacocoHtml/index.html`)
 
 
 ##### 3. Setting up IntelliJ
