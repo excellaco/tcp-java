@@ -11,6 +11,7 @@ import reactor.test.StepVerifier;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 public class CrudServiceUnitTests {
 
@@ -68,7 +69,8 @@ public class CrudServiceUnitTests {
 
   @Test
   private void byId_can_return_instance_when_one_found() {
-
+    Mockito.when(mockRepository.findById(Mockito.anyLong()))
+            .thenReturn();
   }
   // save
 
