@@ -1,16 +1,10 @@
 package com.excella.reactor.controllers;
 
 import com.excella.reactor.common.exceptions.ResourceNotFoundException;
-import com.excella.reactor.domain.DomainModel;
 import com.excella.reactor.service.CrudService;
-import java.util.Arrays;
-import javax.persistence.Entity;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import com.excella.reactor.shared.SampleEntity;
 import org.mockito.ArgumentMatchers;
 import org.mockito.Mockito;
-import org.springframework.data.repository.CrudRepository;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -18,20 +12,10 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
+import java.util.Arrays;
+
 @Test
 public class CrudControllerUnitTests {
-  @Data
-  @NoArgsConstructor
-  @EqualsAndHashCode(callSuper = true)
-  @Entity
-  private class SampleEntity extends DomainModel {}
-
-  private class SampleService implements CrudService {
-
-    public CrudRepository getRepository() {
-      return Mockito.mock(CrudRepository.class);
-    }
-  }
 
   private CrudService mockService;
 
