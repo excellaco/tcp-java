@@ -112,15 +112,16 @@ task testNG(type: Test) {
 	}
 }
 
-test {
-	dependsOn testNG
-}
-
 task integrationTest(type: Test) {
+	useTestNG()
 	testClassesDirs = sourceSets.integrationTest.output.classesDirs
 	classpath = sourceSets.integrationTest.runtimeClasspath
 	outputs.upToDateWhen { false }
+	mustRunAfter testNG
 }
 
-check.dependsOn integrationTest
-integrationTest.mustRunAfter test
+test {
+	dependsOn testNG
+	dependsOn integrationTest
+}
+
