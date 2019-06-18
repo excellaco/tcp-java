@@ -1,6 +1,10 @@
 package com.excella.reactor.service;
 
 import com.excella.reactor.shared.SampleEntity;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
 import org.mockito.ArgumentMatchers;
 import org.mockito.Mockito;
 import org.springframework.data.repository.CrudRepository;
@@ -8,11 +12,6 @@ import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 import reactor.test.StepVerifier;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
 
 public class CrudServiceUnitTests {
 
@@ -90,11 +89,12 @@ public class CrudServiceUnitTests {
     Mockito.verify(mockRepository, Mockito.never()).save(ArgumentMatchers.any());
   }
 
-  // failing on purpose temporarily (mockrepository.save should have sampleentity1 not sampleentity2)
+  // failing on purpose temporarily (mockrepository.save should have sampleentity1 not
+  // sampleentity2)
   @Test
   private void update_returns_mono_with_updated_entity_and_saves_when_matching_id_found() {
 
-    Mockito.when(mockRepository.save(sampleEntity2)).thenReturn(sampleEntity1);
+    Mockito.when(mockRepository.save(sampleEntity1)).thenReturn(sampleEntity1);
     Mockito.when(mockRepository.findById(1234L)).thenReturn(Optional.of(sampleEntity1));
 
     StepVerifier.create(sampleService.update(1234L, sampleEntity1))
@@ -105,4 +105,21 @@ public class CrudServiceUnitTests {
   }
   // delete
 
+  @Test
+  private void delete_does_nothing_when_no_matching_entity_is_found() {
+    Mockito.when(mockRepository.findById(1234L)).thenReturn(Optional.empty());
+
+    StepVerifier.create(sampleService.delete(1234L)).verifyComplete();
+
+    Mockito.verify(mockRepository, Mockito.never()).delete(ArgumentMatchers.any());
+  }
+
+  @Test
+  private void delete_deletes_a_matching_entry_when_found() {
+    Mockito.when(mockRepository.findById(1234L)).thenReturn(Optional.of(sampleEntity1));
+
+    StepVerifier.create(sampleService.delete(1234L)).expectNext(sampleEntity1).verifyComplete();
+
+    Mockito.verify(mockRepository, Mockito.times(1)).delete(ArgumentMatchers.eq(sampleEntity1));
+  }
 }
