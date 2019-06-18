@@ -14,5 +14,8 @@ import lombok.*;
 public class Skill extends DomainModel {
   @Id private Long id;
   private String name;
-  @Embedded private SkillCategory category;
+
+  @ManyToOne(fetch = FetchType.EAGER, optional = false)
+  @JoinColumn(name = "category_id")
+  private SkillCategory category;
 }

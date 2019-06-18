@@ -1,13 +1,14 @@
 package com.excella.reactor.domain;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import java.io.Serializable;
-import javax.persistence.Embeddable;
+import javax.persistence.Entity;
+import javax.persistence.Table;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
-@Embeddable
 @Data
-public class SkillCategory implements Serializable {
-  @JsonProperty("name")
-  private String category;
+@EqualsAndHashCode(callSuper = true)
+@Entity
+@Table(name = "skill_category")
+public class SkillCategory extends DomainModel {
+  private String name;
 }
