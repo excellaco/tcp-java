@@ -10,13 +10,18 @@ import java.time.LocalDate;
 import javax.persistence.Embeddable;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
+
 import lombok.Data;
 
 @Data
 @Embeddable
 public class Bio implements Serializable {
+  @NotEmpty
   private String firstName;
   private String middleName;
+  @NotEmpty
   private String lastName;
 
   @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
@@ -24,11 +29,14 @@ public class Bio implements Serializable {
   @JsonSerialize(using = LocalDateSerializer.class)
   private LocalDate birthDate;
 
+  @NotNull
   @Enumerated(value = EnumType.STRING)
   private Gender gender;
 
+  @NotNull
   @Enumerated(value = EnumType.STRING)
   private Ethnicity ethnicity;
 
-  private boolean usCitizen;
+  @NotNull
+  private Boolean usCitizen;
 }
