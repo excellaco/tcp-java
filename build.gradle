@@ -51,6 +51,24 @@ repositories {
 	mavenCentral()
 }
 
+sourceSets {
+	integrationTest {
+		java {
+			compileClasspath += main.output + test.output
+			runtimeClasspath += main.output + test.output
+			srcDir file('src/integration-test/java')
+		}
+		resources.srcDir file('src/integration-test/resources')
+	}
+}
+
+configurations {
+	integrationTestCompile.extendsFrom testCompile
+	integrationTestRuntime.extendsFrom testRuntime
+	integrationTestImplementation.extendsFrom testImplementation
+
+}
+
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-actuator'
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
@@ -74,10 +92,20 @@ dependencies {
 	
 	runtimeOnly 'org.postgresql:postgresql'
 	annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
+	
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'io.projectreactor:reactor-test'
 	testImplementation group: 'org.testng', name: 'testng', version: '6.14.3'
 	testImplementation 'org.mockito:mockito-inline:2.13.0'
+
+	integrationTestRuntime group: 'org.testng', name: 'testng', version: '6.14.3'
+	integrationTestRuntime 'org.springframework.boot:spring-boot-starter-test'
+	integrationTestRuntime 'io.projectreactor:reactor-test'
+	integrationTestRuntime 'org.mockito:mockito-inline:2.13.0'
+	integrationTestRuntime group: 'com.h2database', name: 'h2', version: '1.4.199'
+
+
+
 }
 
 task testNG(type: Test) {
@@ -87,6 +115,16 @@ task testNG(type: Test) {
 	}
 }
 
+task integrationTest(type: Test) {
+	useTestNG()
+	testClassesDirs = sourceSets.integrationTest.output.classesDirs
+	classpath = sourceSets.integrationTest.runtimeClasspath
+	outputs.upToDateWhen { false }
+	mustRunAfter testNG
+}
+
 test {
 	dependsOn testNG
+	dependsOn integrationTest
 }
+
