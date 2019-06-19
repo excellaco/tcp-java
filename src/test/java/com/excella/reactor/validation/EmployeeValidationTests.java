@@ -2,6 +2,7 @@ package com.excella.reactor.validation;
 
 import com.excella.reactor.domain.*;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import javax.validation.Validation;
 import javax.validation.Validator;
@@ -61,5 +62,29 @@ public class EmployeeValidationTests {
   @Test
   public void employee_is_valid_when_all_fields_valid() {
     assert validator.validate(employee, EmployeeChecks.class, Default.class).isEmpty();
+  }
+
+  @Test
+  public void employee_is_invalid_when_bio_invalid() {
+    employee.setBio(new Bio());
+    assert !validator.validate(employee, EmployeeChecks.class, Default.class).isEmpty();
+  }
+
+  @Test
+  public void employee_is_invalid_when_contact_invalid() {
+    employee.setContact(new Contact());
+    assert !validator.validate(employee, EmployeeChecks.class, Default.class).isEmpty();
+  }
+
+  @Test
+  public void employee_is_invalid_when_skills_list_empty() {
+    employee.setSkills(new ArrayList<>());
+    assert !validator.validate(employee, EmployeeChecks.class, Default.class).isEmpty();
+  }
+
+  @Test
+  public void employee_is_invalid_when_skills_list_invalid() {
+    employee.getSkills().get(0).setPrimary(null);
+    assert !validator.validate(employee, EmployeeChecks.class, Default.class).isEmpty();
   }
 }
