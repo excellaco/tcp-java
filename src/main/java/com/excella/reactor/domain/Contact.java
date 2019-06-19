@@ -6,6 +6,7 @@ import javax.persistence.Embedded;
 import javax.validation.Valid;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import lombok.Data;
 
@@ -14,8 +15,9 @@ import lombok.Data;
 public class Contact implements Serializable {
   @NotEmpty @Email private String email;
 
+  @NotNull
   @Pattern(regexp = "\\d{10}", message = "Phone number must consist of 10 digits")
   private String phoneNumber;
 
-  @Valid @Embedded private Address address;
+  @Embedded @Valid @NotNull private Address address;
 }

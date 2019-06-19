@@ -1,6 +1,6 @@
 package com.excella.reactor.domain;
 
-import com.excella.reactor.validation.SkillChecks;
+import com.excella.reactor.validation.groups.SkillChecks;
 import javax.persistence.*;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;

@@ -1,5 +1,6 @@
 package com.excella.reactor.domain;
 
+import com.excella.reactor.validation.constraints.AdultBirthdate;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
@@ -24,6 +25,8 @@ public class Bio implements Serializable {
   @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
   @JsonDeserialize(using = LocalDateDeserializer.class)
   @JsonSerialize(using = LocalDateSerializer.class)
+  @NotNull
+  @AdultBirthdate
   private LocalDate birthDate;
 
   @NotNull

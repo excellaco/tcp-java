@@ -2,6 +2,7 @@ package com.excella.reactor.validation;
 
 import com.excella.reactor.domain.Skill;
 import com.excella.reactor.domain.SkillCategory;
+import com.excella.reactor.validation.groups.SkillChecks;
 import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.groups.Default;
