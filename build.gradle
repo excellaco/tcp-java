@@ -102,6 +102,9 @@ dependencies {
 	integrationTestRuntime 'org.springframework.boot:spring-boot-starter-test'
 	integrationTestRuntime 'io.projectreactor:reactor-test'
 	integrationTestRuntime 'org.mockito:mockito-inline:2.13.0'
+	integrationTestRuntime group: 'com.h2database', name: 'h2', version: '1.4.199'
+
+
 
 }
 
