@@ -1,13 +1,9 @@
 package com.excella.reactor.domain;
 
+import com.excella.reactor.validation.SkillChecks;
 import javax.persistence.*;
-import javax.validation.GroupSequence;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
-
-import com.excella.reactor.validation.EmployeeChecks;
-import com.excella.reactor.validation.SkillChecks;
-import com.fasterxml.jackson.annotation.JsonSetter;
 import lombok.*;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
@@ -21,18 +17,12 @@ import org.hibernate.annotations.OnDeleteAction;
 @EqualsAndHashCode(callSuper = true)
 @Entity
 public class Skill extends DomainModel {
-  @NotEmpty
+  @NotEmpty(groups = {SkillChecks.class})
   private String name;
 
   @ManyToOne(fetch = FetchType.EAGER, optional = false)
   @JoinColumn(name = "category_id")
   @OnDelete(action = OnDeleteAction.CASCADE)
+  @NotNull(groups = {SkillChecks.class})
   private SkillCategory category;
-
-  @Override
-  @NotNull(groups = {EmployeeChecks.class})
-  public void setId(Long id) {
-    this.id = id;
-  }
-
 }
