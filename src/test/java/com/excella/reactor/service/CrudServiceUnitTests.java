@@ -1,13 +1,14 @@
 package com.excella.reactor.service;
 
 import com.excella.reactor.shared.SampleEntity;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 import java.util.Optional;
 import org.mockito.ArgumentMatchers;
 import org.mockito.Mockito;
-import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -15,27 +16,29 @@ import reactor.test.StepVerifier;
 
 public class CrudServiceUnitTests {
 
-  private CrudRepository<SampleEntity, Long> mockRepository;
+  private JpaRepository<SampleEntity, Long> mockRepository;
 
   private class SampleCrudService implements CrudService<SampleEntity> {
 
     @Override
-    public CrudRepository<SampleEntity, Long> getRepository() {
+    public JpaRepository<SampleEntity, Long> getRepository() {
       return mockRepository;
     }
   }
 
+  private Pageable pageable = null;
+  private Page page = null;
   private SampleCrudService sampleService;
   private SampleEntity sampleEntity1 = new SampleEntity();
   private SampleEntity sampleEntity2 = new SampleEntity();
   private SampleEntity sampleEntity3 = new SampleEntity();
-  private List<SampleEntity> sampleEntityList;
+  private Page<SampleEntity> sampleEntityList;
 
   @BeforeMethod
   private void beforeEach() {
     sampleService = new SampleCrudService();
-    mockRepository = Mockito.mock(CrudRepository.class);
-    sampleEntityList = Arrays.asList(sampleEntity1, sampleEntity2, sampleEntity3);
+    mockRepository = Mockito.mock(JpaRepository.class);
+    sampleEntityList = new PageImpl<>(Arrays.asList(sampleEntity1, sampleEntity2, sampleEntity3));
   }
 
   @AfterMethod
@@ -46,14 +49,16 @@ public class CrudServiceUnitTests {
   // all
   @Test
   private void all_method_can_return_empty_flux() {
-    Mockito.when(mockRepository.findAll()).thenReturn(new ArrayList<>());
-    StepVerifier.create(sampleService.all()).verifyComplete();
+    Mockito.when(mockRepository.findAll(pageable)).thenReturn(page);
+    StepVerifier.create(sampleService.all(null)).verifyComplete();
   }
 
   @Test
   private void all_method_can_return_flux_with_multiple_entities() {
-    Mockito.when(mockRepository.findAll()).thenReturn(sampleEntityList);
-    StepVerifier.create(sampleService.all()).expectNextSequence(sampleEntityList).verifyComplete();
+    Mockito.when(mockRepository.findAll(pageable)).thenReturn(sampleEntityList);
+    StepVerifier.create(sampleService.all(null))
+        .expectNextSequence(sampleEntityList)
+        .verifyComplete();
   }
 
   // byId

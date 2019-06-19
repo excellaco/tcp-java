@@ -4,7 +4,7 @@ import com.excella.reactor.domain.Employee;
 import com.excella.reactor.repositories.EmployeeRepository;
 import com.excella.reactor.service.EmployeeService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -17,7 +17,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     this.repository = repository;
   }
 
-  public CrudRepository<Employee, Long> getRepository() {
+  public JpaRepository<Employee, Long> getRepository() {
     return this.repository;
   }
 }
