@@ -3,7 +3,7 @@ package com.excella.reactor.validation;
 import com.excella.reactor.domain.*;
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.List;
+import java.util.Arrays;
 import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.groups.Default;
@@ -31,7 +31,7 @@ public class EmployeeValidationTests {
 
     employee.setBio(bio);
     employee.setContact(contact);
-    employee.setSkills(List.of(employeeSkill));
+    employee.setSkills(Arrays.asList(employeeSkill));
 
     bio.setEthnicity(Ethnicity.CAUCASIAN);
     bio.setFirstName("John");
@@ -53,38 +53,63 @@ public class EmployeeValidationTests {
     employeeSkill.setProficiency(SkillProficiency.HIGH);
     employeeSkill.setPrimary(Boolean.TRUE);
 
-    skill.setId(1L);
+    skill.setId(1L); // Currently we don't validate ID (Liskov); this is a placeholder.
   }
-
-  @AfterMethod
-  public void runAfterEachMethod() {}
 
   @Test
   public void employee_is_valid_when_all_fields_valid() {
-    assert validator.validate(employee, EmployeeChecks.class, Default.class).isEmpty();
+    assert isValidEmployee();
   }
 
   @Test
   public void employee_is_invalid_when_bio_invalid() {
     employee.setBio(new Bio());
-    assert !validator.validate(employee, EmployeeChecks.class, Default.class).isEmpty();
+    assert !isValidEmployee();
+  }
+
+  @Test
+  public void employee_is_invalid_when_bio_null() {
+    employee.setBio(null);
+    assert !isValidEmployee();
   }
 
   @Test
   public void employee_is_invalid_when_contact_invalid() {
     employee.setContact(new Contact());
-    assert !validator.validate(employee, EmployeeChecks.class, Default.class).isEmpty();
+    assert !isValidEmployee();
+  }
+
+  @Test
+  public void employee_is_invalid_when_contact_null() {
+    employee.setContact(null);
+    assert !isValidEmployee();
   }
 
   @Test
   public void employee_is_invalid_when_skills_list_empty() {
     employee.setSkills(new ArrayList<>());
-    assert !validator.validate(employee, EmployeeChecks.class, Default.class).isEmpty();
+    assert !isValidEmployee();
   }
 
   @Test
-  public void employee_is_invalid_when_skills_list_invalid() {
+  public void employee_is_invalid_when_skills_list_null() {
+    employee.setSkills(null);
+    assert !isValidEmployee();
+  }
+
+  @Test
+  public void employee_is_invalid_when_skills_list_contains_invalid() {
     employee.getSkills().get(0).setPrimary(null);
-    assert !validator.validate(employee, EmployeeChecks.class, Default.class).isEmpty();
+    assert !isValidEmployee();
+  }
+
+  @Test
+  public void employee_is_invalid_when_skills_list_contains_null() {
+    employee.getSkills().set(0, null);
+    assert !isValidEmployee();
+  }
+
+  private boolean isValidEmployee() {
+    return validator.validate(employee, EmployeeChecks.class, Default.class).isEmpty();
   }
 }

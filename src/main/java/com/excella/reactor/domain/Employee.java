@@ -16,9 +16,9 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Entity
 public class Employee extends DomainModel {
-  @Embedded @Valid private Bio bio;
+  @Embedded @Valid @NotNull private Bio bio;
 
-  @Embedded @Valid private Contact contact;
+  @Embedded @Valid @NotNull private Contact contact;
 
   @JsonManagedReference
   @OneToMany(
@@ -27,5 +27,5 @@ public class Employee extends DomainModel {
       cascade = CascadeType.ALL,
       orphanRemoval = true)
   @NotEmpty
-  List<@NotNull @Valid EmployeeSkill> skills;
+  List<@Valid @NotNull EmployeeSkill> skills;
 }
