@@ -5,6 +5,7 @@ import com.excella.reactor.domain.DomainModel;
 import com.excella.reactor.service.CrudService;
 import lombok.extern.slf4j.Slf4j;
 import org.reactivestreams.Publisher;
+import org.springframework.data.domain.Pageable;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,8 +18,8 @@ import reactor.core.publisher.Mono;
 @Slf4j
 public abstract class CrudController<T extends DomainModel> {
   @GetMapping(value = "/", name = "Get all of resource", produces = "application/json")
-  Publisher<T> getAll() {
-    return getService().all().doOnSubscribe(result -> log.info("Getting all"));
+  Publisher<T> getAll(Pageable pageable) {
+    return getService().all(pageable).doOnSubscribe(result -> log.info("Getting all"));
   }
 
   @GetMapping(value = "/{id}", name = "Get resource item by id", produces = "application/json")
