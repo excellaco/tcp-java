@@ -43,8 +43,9 @@ public class CrudControllerUnitTests {
 
   @Test
   private void getAll_can_return_flux_with_multiple_entities() {
-    Mockito.when(mockService.all()).thenReturn(Flux.just(mockEntity1, mockEntity2, mockEntity3));
-    StepVerifier.create(testController.getAll())
+    Mockito.when(mockService.all(null))
+        .thenReturn(Flux.just(mockEntity1, mockEntity2, mockEntity3));
+    StepVerifier.create(testController.getAll(null))
         .expectNextSequence(Arrays.asList(mockEntity1, mockEntity2, mockEntity3))
         .expectComplete()
         .verify();
@@ -52,9 +53,9 @@ public class CrudControllerUnitTests {
 
   @Test
   private void getAll_can_return_empty_flux() {
-    Mockito.when(mockService.all()).thenReturn(Flux.empty());
+    Mockito.when(mockService.all(null)).thenReturn(Flux.empty());
 
-    StepVerifier.create(testController.getAll()).expectComplete().verify();
+    StepVerifier.create(testController.getAll(null)).expectComplete().verify();
   }
 
   // .byId() Throws ResourceNotFoundException if nothing found
