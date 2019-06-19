@@ -11,7 +11,8 @@ CREATE TABLE skill (
 
 ALTER TABLE skill
 ADD CONSTRAINT fk_skill_skcat
-FOREIGN KEY (category_id) REFERENCES skill_category(id);
+FOREIGN KEY (category_id) REFERENCES skill_category(id)
+ON DELETE CASCADE;
 
 CREATE INDEX idx_skill_skcat
 ON skill(category_id);
