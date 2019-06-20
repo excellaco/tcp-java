@@ -1,7 +1,7 @@
 pipeline {
     agent any
     tools {
-        jdk "/usr/lib/jvm/jdk-11.0.1"
+        jdk "Java 11"
     }
     stages {
         stage('Clean') {
