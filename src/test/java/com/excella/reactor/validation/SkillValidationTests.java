@@ -2,12 +2,11 @@ package com.excella.reactor.validation;
 
 import com.excella.reactor.domain.Skill;
 import com.excella.reactor.domain.SkillCategory;
+import javax.validation.Validation;
+import javax.validation.Validator;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
-
-import javax.validation.Validation;
-import javax.validation.Validator;
 
 @Test
 public class SkillValidationTests {
