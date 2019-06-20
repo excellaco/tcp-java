@@ -1,5 +1,8 @@
 pipeline {
     agent any
+    env.JAVA_HOME="${tool '/usr/lib/jvm/jdk-11.0.1'}"
+    env.PATH="${env.JAVA_HOME}/bin:${env.PATH}"
+    sh 'java -version'
 
     stages {
         stage('Clean') {
