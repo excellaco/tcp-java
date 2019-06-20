@@ -1,12 +1,10 @@
 pipeline {
     agent any
-    node (java_test){
-    env.JAVA_HOME="${tool '/usr/lib/jvm/jdk-11.0.1'}"
-    env.PATH="${env.JAVA_HOME}/bin:${env.PATH}"
-    sh 'java -version'
+
     stages {
         stage('Clean') {
             steps {
+                sh 'java -version'
                 gradlew('clean')
             }
         }
@@ -22,8 +20,6 @@ pipeline {
         }
 
     }
-    }
-
 }
 
 def gradlew(String... args) {
