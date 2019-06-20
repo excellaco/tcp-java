@@ -24,7 +24,7 @@ import java.util.Map;
 @Slf4j
 public class JwtTokenConverter extends JwtAccessTokenConverter {
 
-  RSAKey recipientJWK, recipientPublicJWK;
+  private RSAKey recipientJWK, recipientPublicJWK;
 
   public JwtTokenConverter() {
     try {
@@ -40,7 +40,7 @@ public class JwtTokenConverter extends JwtAccessTokenConverter {
     String jwt = super.encode(accessToken, authentication);
 
     try {
-      // jwt is already signed at this point (by JwtAccessTokenConverter)
+      // jwt is already signed at this point (by JwtTokenConverter)
       SignedJWT parsed = SignedJWT.parse(jwt);
 
       // Create JWE object with signed JWT as payload

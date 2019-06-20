@@ -16,6 +16,7 @@ services:
       DB_PORT: 5432
       DB_USER: api_user
       DB_PASSWORD: api_password
+      JAVA_OPTS: ${JAVA_OPTS}
     depends_on:
       - db
     working_dir: /app
