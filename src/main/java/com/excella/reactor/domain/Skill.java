@@ -1,12 +1,17 @@
 package com.excella.reactor.domain;
 
-import com.excella.reactor.validation.groups.SkillChecks;
-import javax.persistence.*;
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
-import lombok.*;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
+
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 
 /**
  * This class represents an immutable skill, as defined in the domain, as opposed to a skill
@@ -17,12 +22,12 @@ import org.hibernate.annotations.OnDeleteAction;
 @EqualsAndHashCode(callSuper = true)
 @Entity
 public class Skill extends DomainModel {
-  @NotEmpty(groups = {SkillChecks.class})
+  @NotEmpty
   private String name;
 
   @ManyToOne(fetch = FetchType.EAGER, optional = false)
   @JoinColumn(name = "category_id")
   @OnDelete(action = OnDeleteAction.CASCADE)
-  @NotNull(groups = {SkillChecks.class})
+  @NotNull
   private SkillCategory category;
 }

@@ -2,13 +2,12 @@ package com.excella.reactor.validation;
 
 import com.excella.reactor.domain.Skill;
 import com.excella.reactor.domain.SkillCategory;
-import com.excella.reactor.validation.groups.SkillChecks;
-import javax.validation.Validation;
-import javax.validation.Validator;
-import javax.validation.groups.Default;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
+
+import javax.validation.Validation;
+import javax.validation.Validator;
 
 @Test
 public class SkillValidationTests {
@@ -52,6 +51,6 @@ public class SkillValidationTests {
   }
 
   private boolean isValidSkill() {
-    return validator.validate(skill, SkillChecks.class, Default.class).isEmpty();
+    return validator.validate(skill).isEmpty();
   }
 }

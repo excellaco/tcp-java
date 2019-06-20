@@ -1,14 +1,15 @@
 package com.excella.reactor.validation;
 
 import com.excella.reactor.domain.*;
-import com.excella.reactor.validation.groups.EmployeeChecks;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.BeforeTest;
+import org.testng.annotations.Test;
+
+import javax.validation.Validation;
+import javax.validation.Validator;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
-import javax.validation.Validation;
-import javax.validation.Validator;
-import javax.validation.groups.Default;
-import org.testng.annotations.*;
 
 @Test
 public class EmployeeValidationTests {
@@ -111,6 +112,6 @@ public class EmployeeValidationTests {
   }
 
   private boolean isValidEmployee() {
-    return validator.validate(employee, EmployeeChecks.class, Default.class).isEmpty();
+    return validator.validate(employee).isEmpty();
   }
 }
