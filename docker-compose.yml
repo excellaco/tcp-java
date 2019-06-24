@@ -16,6 +16,10 @@ services:
       DB_PORT: 5432
       DB_USER: api_user
       DB_PASSWORD: api_password
+      JWT_KEY_STORE: ${JWT_KEY_STORE}
+      JWT_KEY_STORE_PASS: ${JWT_KEY_STORE_PASS}
+      JWT_KEYPAIR_ALIAS: ${JWT_KEYPAIR_ALIAS}
+      JWT_KEYPAIR_PASS: ${JWT_KEYPAIR_PASS}
     depends_on:
       - db
     working_dir: /app
