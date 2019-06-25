@@ -95,7 +95,8 @@ public class SwaggerConfig {
     return new ApiInfoBuilder()
         .title("TCP API Contract")
         .description("API Contract for Excella's Tech Challenge Platform (TCP)")
-        .contact(new Contact("Kenneth Russell", "http://www.excella.com", "kenneth.russell@excella.com"))
+        .contact(
+            new Contact("Kenneth Russell", "http://www.excella.com", "kenneth.russell@excella.com"))
         .version("1.0.0")
         .build();
   }
