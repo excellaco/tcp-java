@@ -1,13 +1,21 @@
 package com.excella.reactor.config;
 
 import lombok.Data;
+import org.springframework.boot.autoconfigure.security.oauth2.OAuth2ClientProperties;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.core.io.Resource;
 
 @Data
 @ConfigurationProperties(value = "security", ignoreInvalidFields = true)
 public class SecurityProperties {
+
+  private OAuth2Properties oauth2;
   private JwtProperties jwt;
+
+  @Data
+  static class OAuth2Properties {
+    private OAuth2ClientProperties client;
+  }
 
   @Data
   static class JwtProperties {
