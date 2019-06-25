@@ -28,7 +28,6 @@ public class AuthorizationConfig extends AuthorizationServerConfigurerAdapter {
   private final PasswordEncoder passwordEncoder;
   private final AuthenticationManager authenticationManager;
   private final SecurityProperties securityProperties;
-
   private JwtAccessTokenConverter jwtAccessTokenConverter;
   private TokenStore tokenStore;
 
@@ -43,6 +42,11 @@ public class AuthorizationConfig extends AuthorizationServerConfigurerAdapter {
     this.securityProperties = securityProperties;
   }
 
+  /**
+   * Creates a JWT Token Store given a JWT Access Token Converter.
+   *
+   * @return TokenStore
+   */
   @Bean
   public TokenStore tokenStore() {
     if (tokenStore == null) {
@@ -51,6 +55,14 @@ public class AuthorizationConfig extends AuthorizationServerConfigurerAdapter {
     return tokenStore;
   }
 
+  /**
+   * Sets up the token service that authorizes and authenticates with JWT, users stored in the DB,
+   * and the Authentication Manager.
+   *
+   * @param tokenStore tokenStore
+   * @param clientDetailsService clientDetailsService
+   * @return Default token service
+   */
   @Bean
   public DefaultTokenServices tokenServices(
       final TokenStore tokenStore, final ClientDetailsService clientDetailsService) {
@@ -62,6 +74,11 @@ public class AuthorizationConfig extends AuthorizationServerConfigurerAdapter {
     return tokenServices;
   }
 
+  /**
+   * Creates a JWT access token converter with the JKS file in the classpath.
+   *
+   * @return JwtAccessTokenConcerter
+   */
   @Bean
   public JwtAccessTokenConverter jwtAccessTokenConverter() {
     if (jwtAccessTokenConverter != null) {
@@ -95,6 +112,12 @@ public class AuthorizationConfig extends AuthorizationServerConfigurerAdapter {
         .tokenStore(tokenStore());
   }
 
+  /**
+   * Configures Authentication, setting password encoder and permissions on a token.
+   *
+   * @see WebSecurityConfiguration#passwordEncoder()
+   * @param oauthServer oauthServer
+   */
   @Override
   public void configure(final AuthorizationServerSecurityConfigurer oauthServer) {
     oauthServer
@@ -117,7 +140,8 @@ public class AuthorizationConfig extends AuthorizationServerConfigurerAdapter {
   }
 
   /**
-   * Return a KeyStoreKeyFactory given JWT properties.
+   * Creates a keyStoreKeyFactory with JWT Properties. Gets the KeyPair value from the JKS file
+   * using the credentials in the JWTProperties in the application.yml file.
    *
    * @param jwtProperties jwtProperties
    * @return KeyStoreKeyFactory

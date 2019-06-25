@@ -23,17 +23,36 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
     this.dataSource = dataSource;
   }
 
+  /**
+   * Sets up Authentication with a UserDetailsService and PasswordEncoder.
+   *
+   * @see #userDetailsService()
+   * @see #passwordEncoder()
+   * @param auth AuthenticationManagerBuider
+   * @throws Exception exception
+   */
   @Override
   protected void configure(final AuthenticationManagerBuilder auth) throws Exception {
     auth.userDetailsService(userDetailsService()).passwordEncoder(passwordEncoder());
   }
 
+  /**
+   * Returns the default implementation of the AuthenticationManager and creates a bean from it.
+   *
+   * @return AuthenticationManager
+   * @throws Exception exception
+   */
   @Bean
   @Override
   public AuthenticationManager authenticationManagerBean() throws Exception {
     return super.authenticationManagerBean();
   }
 
+  /**
+   * Creates a password encoder.
+   *
+   * @return PasswordEncoder
+   */
   @Bean
   public PasswordEncoder passwordEncoder() {
     if (passwordEncoder == null) {
@@ -42,7 +61,16 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
     return passwordEncoder;
   }
 
+  /**
+   * Overrides default implementation and sets up UserDetailsService using default JdbcDaoImpl and
+   * sets the datasource to the application's default (in this case, it's Postgres). See the
+   * properties under spring.datasource in the application.yml.
+   *
+   * @see WebSecurityConfigurerAdapter#userDetailsServiceBean()
+   * @return UserDetailsService
+   */
   @Bean
+  @Override
   public UserDetailsService userDetailsService() {
     if (userDetailsService == null) {
       userDetailsService = new JdbcDaoImpl();

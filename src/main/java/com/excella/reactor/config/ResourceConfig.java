@@ -13,23 +13,26 @@ import org.springframework.security.oauth2.provider.token.TokenStore;
 @EnableConfigurationProperties(SecurityProperties.class)
 public class ResourceConfig extends ResourceServerConfigurerAdapter {
 
-  private final SecurityProperties securityProperties;
-
   private TokenStore tokenStore;
 
-  public ResourceConfig(final SecurityProperties securityProperties, final TokenStore tokenStore) {
-    this.securityProperties = securityProperties;
+  public ResourceConfig(final TokenStore tokenStore) {
     this.tokenStore = tokenStore;
   }
 
+  /**
+   * Sets the token store for the resource server.
+   *
+   * @see AuthorizationConfig#tokenStore()
+   * @param resources resources
+   */
   @Override
   public void configure(final ResourceServerSecurityConfigurer resources) {
     resources.tokenStore(tokenStore);
   }
 
   /**
-   * Authentication setup for endpoints. Swagger URIs are white-listed. Everything else requires
-   * authentication.
+   * Authentication setup for endpoints. Swagger URIs are white-listed. Everything else requires the
+   * user to be authenticated.
    *
    * @param http HttpSeccurity
    * @throws Exception exception
