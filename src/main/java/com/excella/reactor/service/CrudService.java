@@ -1,5 +1,6 @@
 package com.excella.reactor.service;
 
+import com.excella.reactor.common.exceptions.ResourceNotFoundException;
 import com.excella.reactor.common.reactor.MonoUtils;
 import com.excella.reactor.domain.DomainModel;
 import org.springframework.data.domain.Pageable;
@@ -13,7 +14,9 @@ public interface CrudService<T extends DomainModel> {
   }
 
   default Mono<T> byId(Long id) {
-    return MonoUtils.fromCallableOpt(() -> getRepository().findById(id));
+    return MonoUtils.fromCallableOpt(() -> getRepository().findById(id))
+        .switchIfEmpty(
+            Mono.error(ResourceNotFoundException.of("Resource with id " + id + "not found")));
   }
 
   default Mono<T> save(T t) {

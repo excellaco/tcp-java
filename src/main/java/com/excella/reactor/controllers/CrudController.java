@@ -1,6 +1,5 @@
 package com.excella.reactor.controllers;
 
-import com.excella.reactor.common.exceptions.ResourceNotFoundException;
 import com.excella.reactor.domain.DomainModel;
 import com.excella.reactor.service.CrudService;
 import lombok.extern.slf4j.Slf4j;
@@ -13,7 +12,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import reactor.core.publisher.Mono;
 
 @Slf4j
 public abstract class CrudController<T extends DomainModel> {
@@ -24,10 +22,7 @@ public abstract class CrudController<T extends DomainModel> {
 
   @GetMapping(value = "/{id}", name = "Get resource item by id", produces = "application/json")
   Publisher<T> getById(@PathVariable Long id) {
-    return getService()
-        .byId(id)
-        .doOnSubscribe(result -> log.info("Getting id {}", id))
-        .switchIfEmpty(Mono.error(ResourceNotFoundException.of("No book was found")));
+    return getService().byId(id).doOnSubscribe(result -> log.info("Getting id {}", id));
   }
 
   @PostMapping(value = "/", name = "Add a new resource item", produces = "application/json")
