@@ -44,8 +44,6 @@ public class AuthorizationConfig extends AuthorizationServerConfigurerAdapter {
 
   @Bean
   public TokenStore tokenStore() {
-    System.out.println("Security Properties");
-    System.out.println(this.securityProperties);
     if (tokenStore == null) {
       tokenStore = new JwtTokenStore(jwtAccessTokenConverter());
     }

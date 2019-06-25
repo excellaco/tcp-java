@@ -38,6 +38,8 @@ username: user
 password: pass
 ```
 
+
+
 You must retrieve a token before hitting any other endpoints. To do so, create a POST request to `/oauth/token`. Use Basic Auth (with client id and secret) in the header with the username, password, and grant_type in the payload.
 
 

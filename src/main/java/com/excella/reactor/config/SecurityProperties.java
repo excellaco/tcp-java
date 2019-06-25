@@ -12,7 +12,6 @@ public class SecurityProperties {
   private JwtProperties jwt;
 
   @Data
-  @AllArgsConstructor
   static class JwtProperties {
 
     private Resource keyStore;
