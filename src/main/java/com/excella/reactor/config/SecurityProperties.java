@@ -1,6 +1,5 @@
 package com.excella.reactor.config;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.core.io.Resource;
@@ -18,7 +17,5 @@ public class SecurityProperties {
     private String keyStorePassword;
     private String keyPairAlias;
     private String keyPairPassword;
-
-
   }
 }

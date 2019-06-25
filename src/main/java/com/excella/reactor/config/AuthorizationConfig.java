@@ -1,5 +1,7 @@
 package com.excella.reactor.config;
 
+import java.security.KeyPair;
+import javax.sql.DataSource;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -17,9 +19,6 @@ import org.springframework.security.oauth2.provider.token.store.JwtAccessTokenCo
 import org.springframework.security.oauth2.provider.token.store.JwtTokenStore;
 import org.springframework.security.oauth2.provider.token.store.KeyStoreKeyFactory;
 
-import javax.sql.DataSource;
-import java.security.KeyPair;
-
 @Configuration
 @EnableAuthorizationServer
 @EnableConfigurationProperties(SecurityProperties.class)
@@ -34,8 +33,10 @@ public class AuthorizationConfig extends AuthorizationServerConfigurerAdapter {
   private TokenStore tokenStore;
 
   public AuthorizationConfig(
-      final DataSource dataSource, final PasswordEncoder passwordEncoder,
-      final AuthenticationManager authenticationManager, final SecurityProperties securityProperties) {
+      final DataSource dataSource,
+      final PasswordEncoder passwordEncoder,
+      final AuthenticationManager authenticationManager,
+      final SecurityProperties securityProperties) {
     this.dataSource = dataSource;
     this.passwordEncoder = passwordEncoder;
     this.authenticationManager = authenticationManager;
@@ -77,6 +78,7 @@ public class AuthorizationConfig extends AuthorizationServerConfigurerAdapter {
 
   /**
    * Stores OAuth client details in database.
+   *
    * @param clients clients
    * @throws Exception exception
    */
@@ -87,33 +89,41 @@ public class AuthorizationConfig extends AuthorizationServerConfigurerAdapter {
 
   @Override
   public void configure(final AuthorizationServerEndpointsConfigurer endpoints) {
-    endpoints.authenticationManager(this.authenticationManager)
+    endpoints
+        .authenticationManager(this.authenticationManager)
         .accessTokenConverter(jwtAccessTokenConverter())
         .tokenStore(tokenStore());
   }
 
   @Override
   public void configure(final AuthorizationServerSecurityConfigurer oauthServer) {
-    oauthServer.passwordEncoder(this.passwordEncoder).tokenKeyAccess("permitAll()")
+    oauthServer
+        .passwordEncoder(this.passwordEncoder)
+        .tokenKeyAccess("permitAll()")
         .checkTokenAccess("isAuthenticated()");
   }
 
   /**
    * Get KeyPair object from a JKS file.
+   *
    * @param jwtProperties jwtProperties
    * @param keyStoreKeyFactory keyStoreKeyFactory
    * @return KeyPair object.
    */
-  private KeyPair keyPair(SecurityProperties.JwtProperties jwtProperties, KeyStoreKeyFactory keyStoreKeyFactory) {
-    return keyStoreKeyFactory.getKeyPair(jwtProperties.getKeyPairAlias(), jwtProperties.getKeyPairPassword().toCharArray());
+  private KeyPair keyPair(
+      SecurityProperties.JwtProperties jwtProperties, KeyStoreKeyFactory keyStoreKeyFactory) {
+    return keyStoreKeyFactory.getKeyPair(
+        jwtProperties.getKeyPairAlias(), jwtProperties.getKeyPairPassword().toCharArray());
   }
 
   /**
    * Return a KeyStoreKeyFactory given JWT properties.
+   *
    * @param jwtProperties jwtProperties
    * @return KeyStoreKeyFactory
    */
   private KeyStoreKeyFactory keyStoreKeyFactory(SecurityProperties.JwtProperties jwtProperties) {
-    return new KeyStoreKeyFactory(jwtProperties.getKeyStore(), jwtProperties.getKeyStorePassword().toCharArray());
+    return new KeyStoreKeyFactory(
+        jwtProperties.getKeyStore(), jwtProperties.getKeyStorePassword().toCharArray());
   }
 }

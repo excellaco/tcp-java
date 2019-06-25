@@ -1,7 +1,5 @@
 package com.excella.reactor.config;
 
-import com.excella.reactor.common.exceptions.CustomSetupException;
-import io.micrometer.core.instrument.util.IOUtils;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -9,10 +7,6 @@ import org.springframework.security.oauth2.config.annotation.web.configuration.E
 import org.springframework.security.oauth2.config.annotation.web.configuration.ResourceServerConfigurerAdapter;
 import org.springframework.security.oauth2.config.annotation.web.configurers.ResourceServerSecurityConfigurer;
 import org.springframework.security.oauth2.provider.token.TokenStore;
-
-import java.io.IOException;
-
-import static java.nio.charset.StandardCharsets.UTF_8;
 
 @Configuration
 @EnableResourceServer
@@ -34,8 +28,9 @@ public class ResourceConfig extends ResourceServerConfigurerAdapter {
   }
 
   /**
-   * Authentication setup for endpoints.
-   * Swagger URIs are white-listed. Everything else requires authentication.
+   * Authentication setup for endpoints. Swagger URIs are white-listed. Everything else requires
+   * authentication.
+   *
    * @param http HttpSeccurity
    * @throws Exception exception
    */
@@ -50,8 +45,9 @@ public class ResourceConfig extends ResourceServerConfigurerAdapter {
             "/v2/api-docs",
             "/api-docs/**",
             "/configuration/**",
-            "/webjars/springfox-swagger-ui/**"
-        ).permitAll()
-        .antMatchers("/**").authenticated();
+            "/webjars/springfox-swagger-ui/**")
+        .permitAll()
+        .antMatchers("/**")
+        .authenticated();
   }
 }
