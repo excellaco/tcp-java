@@ -13,7 +13,7 @@ pipeline {
         stage('Unit Tests') {
             steps {
                 sh 'java -version'
-                gradlew('test')
+                gradlew('testNG')
             }
             post {
                 always {
