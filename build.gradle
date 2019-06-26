@@ -27,10 +27,6 @@ configurations {
 jacoco {
 	toolVersion = "0.8.3"
 	reportsDir = file("$buildDir/jacocoReportDir")
-	excludes = [
-	    "**/domain/**",
-			"**/config/**"
-	]
 }
 
 jacocoTestReport {
@@ -44,6 +40,11 @@ jacocoTestReport {
 jacocoTestCoverageVerification {
 	violationRules {
 		rule {
+			element = 'CLASS'
+			excludes = [
+					"**/domain/**",
+					"**/config/**"
+			]
 			limit {
 				minimum = 0.0
 			}
