@@ -40,6 +40,8 @@ jacocoTestReport {
 jacocoTestCoverageVerification {
 	violationRules {
 		rule {
+			element = 'CLASS'
+			excludes = ["**/config/**"]
 			limit {
 				minimum = 0.0
 			}
@@ -72,7 +74,8 @@ configurations {
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-actuator'
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-
+	implementation 'org.springframework.boot:spring-boot-starter-security'
+	implementation 'org.springframework.security.oauth.boot:spring-security-oauth2-autoconfigure:2.1.6.RELEASE'
 
 	implementation 'org.springframework.boot:spring-boot-starter-jetty'
 	implementation('org.springframework.boot:spring-boot-starter-web') {
@@ -112,6 +115,7 @@ task testNG(type: Test) {
 	useTestNG()
 	jacoco {
 		destinationFile = file("$buildDir/jacoco/test.exec")
+		excludes = ["**/config/**"]
 	}
 }
 
