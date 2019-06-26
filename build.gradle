@@ -118,6 +118,10 @@ task testNG(type: Test) {
 	useTestNG()
 	jacoco {
 		destinationFile = file("$buildDir/jacoco/test.exec")
+		excludes = [
+				"**/domain/**",
+				"**/config/**"
+		]
 	}
 }
 
