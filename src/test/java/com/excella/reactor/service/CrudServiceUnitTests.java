@@ -1,5 +1,6 @@
 package com.excella.reactor.service;
 
+import com.excella.reactor.common.exceptions.ResourceNotFoundException;
 import com.excella.reactor.shared.SampleEntity;
 import java.util.Arrays;
 import java.util.Optional;
@@ -64,9 +65,11 @@ public class CrudServiceUnitTests {
   // byId
 
   @Test
-  private void byId_can_return_nothing_when_no_matching_instance_found() {
-    Mockito.when(mockRepository.findById(Mockito.anyLong())).thenReturn(null);
-    StepVerifier.create(sampleService.byId(1234L)).verifyComplete();
+  private void byId_throws_ResourceNotFoundException_if_nothing_found() {
+    Mockito.when(mockRepository.findById(Mockito.anyLong())).thenReturn(Optional.empty());
+    StepVerifier.create(sampleService.byId(1234L))
+        .expectError(ResourceNotFoundException.class)
+        .verify();
   }
 
   @Test
@@ -89,13 +92,13 @@ public class CrudServiceUnitTests {
     Mockito.when(mockRepository.save(Mockito.any())).thenReturn(sampleEntity1);
     Mockito.when(mockRepository.findById(Mockito.any())).thenReturn(Optional.empty());
 
-    StepVerifier.create(sampleService.update(1234L, sampleEntity1)).verifyComplete();
+    StepVerifier.create(sampleService.update(1234L, sampleEntity1))
+        .expectError(ResourceNotFoundException.class)
+        .verify();
 
     Mockito.verify(mockRepository, Mockito.never()).save(ArgumentMatchers.any());
   }
 
-  // failing on purpose temporarily (mockrepository.save should have sampleentity1 not
-  // sampleentity2)
   @Test
   private void update_returns_mono_with_updated_entity_and_saves_when_matching_id_found() {
 
@@ -114,7 +117,9 @@ public class CrudServiceUnitTests {
   private void delete_does_nothing_when_no_matching_entity_is_found() {
     Mockito.when(mockRepository.findById(1234L)).thenReturn(Optional.empty());
 
-    StepVerifier.create(sampleService.delete(1234L)).verifyComplete();
+    StepVerifier.create(sampleService.delete(1234L))
+        .expectError(ResourceNotFoundException.class)
+        .verify();
 
     Mockito.verify(mockRepository, Mockito.never()).delete(ArgumentMatchers.any());
   }

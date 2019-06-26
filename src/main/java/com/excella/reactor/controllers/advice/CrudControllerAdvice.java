@@ -18,19 +18,42 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
+/**
+ * ControllerAdvice Component used to handle exceptions. Currently applies globally, but could be
+ * targeted more specifically using the annotation's arguments.
+ */
 @ControllerAdvice
 @Slf4j
 @RequestMapping
 public class CrudControllerAdvice {
 
+  /**
+   * Handles custom 404 Exception. We typically wrap these into the response {@code Publisher} when
+   * the repository returns no resource for a query by ID, and they are thrown when the subscription
+   * fires.
+   *
+   * @param e the {@code ResourceNotFoundException} being handled
+   * @return a {@code GenericError} with the message of the 404 Exception
+   * @see com.excella.reactor.service.CrudService#byId(Long)
+   */
   @ExceptionHandler(ResourceNotFoundException.class)
   @ResponseStatus(HttpStatus.NOT_FOUND)
   @ResponseBody
   GenericError handleResourceNotFoundException(final ResourceNotFoundException e) {
     log.warn(e.getMessage(), e.getCause());
-    return buildGenericError("Resource not found", HttpStatus.NOT_FOUND, null);
+    return buildGenericError(e.getMessage(), HttpStatus.NOT_FOUND, null);
   }
 
+  /**
+   * Handles exceptions caused by integrity constraint violations. Typically indicative of an
+   * attempt to insert a value with non-unique primary key.
+   *
+   * <p>One instance where this could occur, even with generated primary keys, is if an insert is
+   * cascaded to a join table, and the composite key is not unique.
+   *
+   * @param e the {@code DataIntegrityViolationException} being handled
+   * @return a {@code GenericError} indicating the conflict
+   */
   @ExceptionHandler(DataIntegrityViolationException.class)
   @ResponseStatus(HttpStatus.CONFLICT)
   @ResponseBody
@@ -40,6 +63,13 @@ public class CrudControllerAdvice {
         "The resource could not be persisted or altered as specified", HttpStatus.CONFLICT, null);
   }
 
+  /**
+   * Handles validation exceptions typically triggered by a model being checked with {@code @Valid}
+   * or {@code @Validated}.
+   *
+   * @param e the {@code MethodArgumentNotValidException} being handled
+   * @return a {@code GenericError} holding formatted details about the fields failing validation
+   */
   @ExceptionHandler(MethodArgumentNotValidException.class)
   @ResponseStatus(HttpStatus.BAD_REQUEST)
   @ResponseBody
@@ -47,7 +77,7 @@ public class CrudControllerAdvice {
     log.warn(e.getMessage(), e.getCause());
     return buildGenericError(
         "Validation errors occurred",
-        HttpStatus.BAD_REQUEST,
+        HttpStatus.BAD_REQUEST, // Consider HttpStatus.UNPROCESSABLE_ENTITY
         e.getBindingResult()
             .getFieldErrors()
             .stream()
@@ -56,8 +86,12 @@ public class CrudControllerAdvice {
   }
 
   /**
-   * @param e
-   * @return
+   * Handles a constraint violation exception. These are typically triggered by an internal
+   * constraint validation or a path variable being checked, as opposed to a model being checked
+   * with {@code @Valid} or {@code @Validated}.
+   *
+   * @param e the {@code ConstraintViolationException} being handled
+   * @return a {@code GenericError} holding formatted details about the constraint violations
    */
   @ExceptionHandler(ConstraintViolationException.class)
   @ResponseStatus(HttpStatus.BAD_REQUEST)
@@ -66,7 +100,7 @@ public class CrudControllerAdvice {
     log.warn(e.getMessage(), e.getCause());
     return buildGenericError(
         "Validation errors occurred",
-        HttpStatus.BAD_REQUEST,
+        HttpStatus.BAD_REQUEST, // Consider HttpStatus.UNPROCESSABLE_ENTITY
         e.getConstraintViolations()
             .stream()
             .map(CrudControllerAdvice::formatConstraintViolation)
@@ -78,8 +112,8 @@ public class CrudControllerAdvice {
    * rollback, e.g., an invalid foreign key value being used on a cascaded insert (results in null).
    *
    * @param e The TransactionSystemException being handled
-   * @return If caused by constraint violations, a response listing those violations; otherwise, an
-   *     internal error response.
+   * @return If caused by constraint violations, a {@code 409 Conflict} response listing those
+   *     violations; otherwise, an internal error response.
    */
   @ExceptionHandler(TransactionSystemException.class)
   ResponseEntity<GenericError> handleTransactionException(final TransactionSystemException e) {
@@ -94,6 +128,15 @@ public class CrudControllerAdvice {
     return new ResponseEntity<>(handleFallbackException(e), HttpStatus.INTERNAL_SERVER_ERROR);
   }
 
+  /**
+   * Handles errors that most commonly occur when transforming the HTTP request to the RequestBody
+   * object. Most commonly seen when the value of a field does not match the type expected on the
+   * receiving object. One example is an invalid value being de-serialized to an enum-typed field.
+   *
+   * @param e the {@code HttpMessageNotReadableException} being handled
+   * @return a response indicating a {@literal 400 Bad Request}, including details about the
+   *     offending field if possible
+   */
   @ExceptionHandler(HttpMessageNotReadableException.class)
   ResponseEntity<GenericError> handleHttpNotReadableException(
       final HttpMessageNotReadableException e) {
@@ -107,15 +150,28 @@ public class CrudControllerAdvice {
           HttpStatus.BAD_REQUEST);
     }
 
-    return new ResponseEntity<>(handleFallbackException(e), HttpStatus.INTERNAL_SERVER_ERROR);
+    /* Errors reaching this statement would still almost certainly be the client's fault,
+    so we should still send a 400 status code. */
+    return new ResponseEntity<>(handleFallbackException(e), HttpStatus.BAD_REQUEST);
   }
 
+  /**
+   * Fallback handler for all exceptions. Does not expose details of the exception on the response
+   * object.
+   *
+   * <p>In contrast with other handlers, this will log the class of the exception. The intent is to
+   * inform future implementation of more specific handling.
+   *
+   * @param e the {@code Exception} being handled
+   * @return a {@code GenericError} representing an Internal Server Error with no details exposed.
+   */
   @ExceptionHandler(Exception.class)
   @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
   @ResponseBody
   GenericError handleFallbackException(final Exception e) {
     log.warn(e.getClass().getSimpleName() + ": " + e.getMessage(), e.getCause());
-    return buildGenericError("An internal error occurred", HttpStatus.INTERNAL_SERVER_ERROR, null);
+    return buildGenericError(
+        "An error occurred while processing the request", HttpStatus.INTERNAL_SERVER_ERROR, null);
   }
 
   private static GenericError buildGenericError(

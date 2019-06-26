@@ -1,6 +1,5 @@
 package com.excella.reactor.controllers;
 
-import com.excella.reactor.common.exceptions.ResourceNotFoundException;
 import com.excella.reactor.service.CrudService;
 import com.excella.reactor.shared.SampleEntity;
 import java.util.Arrays;
@@ -56,16 +55,6 @@ public class CrudControllerUnitTests {
     Mockito.when(mockService.all(null)).thenReturn(Flux.empty());
 
     StepVerifier.create(testController.getAll(null)).expectComplete().verify();
-  }
-
-  // .byId() Throws ResourceNotFoundException if nothing found
-
-  @Test
-  private void byId_throws_ResourceNotFoundException_if_nothing_found() {
-    Mockito.when(mockService.byId(Mockito.anyLong())).thenReturn(Mono.empty());
-    StepVerifier.create(testController.getById(1234L))
-        .expectError(ResourceNotFoundException.class)
-        .verify();
   }
 
   // .byId() returns an entity if one is found

@@ -16,7 +16,7 @@ public interface CrudService<T extends DomainModel> {
   default Mono<T> byId(Long id) {
     return MonoUtils.fromCallableOpt(() -> getRepository().findById(id))
         .switchIfEmpty(
-            Mono.error(ResourceNotFoundException.of("Resource with id " + id + "not found")));
+            Mono.error(ResourceNotFoundException.of("Resource with id " + id + " not found")));
   }
 
   default Mono<T> save(T t) {
