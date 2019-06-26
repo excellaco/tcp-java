@@ -66,7 +66,7 @@ public class AuthorizationConfig extends AuthorizationServerConfigurerAdapter {
   @Bean
   public DefaultTokenServices tokenServices(
       final TokenStore tokenStore, final ClientDetailsService clientDetailsService) {
-    DefaultTokenServices tokenServices = new DefaultTokenServices();
+    var tokenServices = new DefaultTokenServices();
     tokenServices.setSupportRefreshToken(true);
     tokenServices.setTokenStore(tokenStore);
     tokenServices.setClientDetailsService(clientDetailsService);
