@@ -88,7 +88,8 @@ public class CrudServiceUnitTests {
 
   // update
   @Test
-  private void update_returns_empty_mono_and_does_not_save_new_entity_when_no_matching_id_found() {
+  private void
+      update_throws_ResourceNotFoundException_and_does_not_save_new_entity_when_no_matching_id_found() {
     Mockito.when(mockRepository.save(Mockito.any())).thenReturn(sampleEntity1);
     Mockito.when(mockRepository.findById(Mockito.any())).thenReturn(Optional.empty());
 
@@ -114,7 +115,7 @@ public class CrudServiceUnitTests {
   // delete
 
   @Test
-  private void delete_does_nothing_when_no_matching_entity_is_found() {
+  private void delete_throws_ResourceNotFoundException_when_no_matching_entity_is_found() {
     Mockito.when(mockRepository.findById(1234L)).thenReturn(Optional.empty());
 
     StepVerifier.create(sampleService.delete(1234L))
