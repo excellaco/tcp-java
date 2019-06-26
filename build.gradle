@@ -27,7 +27,7 @@ configurations {
 jacoco {
 	toolVersion = "0.8.3"
 	reportsDir = file("$buildDir/jacocoReportDir")
-	exclude = [
+	excludes = [
 	    "**/domain/**",
 			"**/config/**"
 	]
