@@ -121,7 +121,8 @@ public class CrudControllerAdvice {
       log.warn(e.getMessage(), e.getCause());
 
       return new ResponseEntity<>(
-          handleConstraintViolationException((ConstraintViolationException) e.getRootCause()),
+          handleConstraintViolationException((ConstraintViolationException) e.getRootCause())
+              .withCode(HttpStatus.CONFLICT.value()),
           HttpStatus.CONFLICT);
     }
 
@@ -152,7 +153,9 @@ public class CrudControllerAdvice {
 
     /* Errors reaching this statement would still almost certainly be the client's fault,
     so we should still send a 400 status code. */
-    return new ResponseEntity<>(handleFallbackException(e), HttpStatus.BAD_REQUEST);
+    return new ResponseEntity<>(
+        handleFallbackException(e).withCode(HttpStatus.BAD_REQUEST.value()),
+        HttpStatus.BAD_REQUEST);
   }
 
   /**

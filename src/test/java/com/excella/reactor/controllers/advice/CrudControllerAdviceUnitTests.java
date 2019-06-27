@@ -2,6 +2,9 @@ package com.excella.reactor.controllers.advice;
 
 import com.excella.reactor.common.exceptions.GenericError;
 import com.excella.reactor.common.exceptions.ResourceNotFoundException;
+import com.fasterxml.jackson.databind.exc.MismatchedInputException;
+import java.util.Collections;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import javax.validation.ConstraintViolation;
@@ -11,6 +14,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.mockito.Mockito;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.transaction.TransactionSystemException;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -81,8 +87,6 @@ public class CrudControllerAdviceUnitTests {
 
     var exception = Mockito.mock(MethodArgumentNotValidException.class);
     Mockito.when(exception.getBindingResult()).thenReturn(bindingResult);
-    Mockito.when(exception.getMessage())
-        .thenReturn("Test Exception"); // Due to side effects this is necessary
 
     var actualError = advice.handleRequestValidationException(exception);
 
@@ -106,18 +110,134 @@ public class CrudControllerAdviceUnitTests {
             .details(expectedErrorCodes)
             .build();
 
-    var constraintViolations =
-        Set.of(
-            mockConstraintViolation("TEST1", "INVALID", "A"),
-            mockConstraintViolation("TEST2", "INVALID", false));
+    // Must be a LinkedHashSet else it is not guaranteed to collect to List in insertion order.
+    Set<ConstraintViolation<?>> constraintViolations = new LinkedHashSet<>();
+    constraintViolations.add(mockConstraintViolation("TEST1", "INVALID", "A"));
+    constraintViolations.add(mockConstraintViolation("TEST2", "INVALID", false));
+
     var exception = Mockito.mock(ConstraintViolationException.class);
     Mockito.when(exception.getConstraintViolations()).thenReturn(constraintViolations);
-    Mockito.when(exception.getMessage())
-        .thenReturn("Test Exception"); // Due to side effects this is necessary
 
     var actualError = advice.handleConstraintViolationException(exception);
 
     assert expectedError.equals(actualError);
+  }
+
+  @Test(
+      description =
+          "When the root cause is a ConstraintViolationException, "
+              + "handleTransactionException should yield a response with a 409 Conflict Status "
+              + "and containing a GenericError describing the constraint violation")
+  public void testHandleTransactionExceptionWhenConstraintViolation() {
+    var expectedErrorCodes = List.of(formatFieldRejection("TEST1", "INVALID", "A"));
+    var expectedError =
+        GenericError.builder()
+            .message("Validation errors occurred")
+            .code(HttpStatus.CONFLICT.value())
+            .details(expectedErrorCodes)
+            .build();
+
+    var expectedResponse = new ResponseEntity<>(expectedError, HttpStatus.CONFLICT);
+
+    var exception = Mockito.mock(TransactionSystemException.class);
+    var rootCause = Mockito.mock(ConstraintViolationException.class);
+    Mockito.when(exception.getRootCause()).thenReturn(rootCause);
+
+    Set<ConstraintViolation<?>> constraintViolations =
+        Set.of(mockConstraintViolation("TEST1", "INVALID", "A"));
+    Mockito.when(rootCause.getConstraintViolations()).thenReturn(constraintViolations);
+
+    var actualResponse = advice.handleTransactionException(exception);
+
+    assert expectedResponse.equals(actualResponse);
+  }
+
+  @Test(
+      description =
+          "When the root cause is not a ConstraintViolationException, "
+              + "handleTransactionException should yield a response with a 500 Internal Error Status "
+              + "and containing a GenericError indicating an unknown error.")
+  public void testHandleTransactionExceptionWhenOtherCause() {
+    var expectedError =
+        GenericError.builder()
+            .message("An error occurred while processing the request")
+            .code(HttpStatus.INTERNAL_SERVER_ERROR.value())
+            .build();
+
+    var expectedResponse = new ResponseEntity<>(expectedError, HttpStatus.INTERNAL_SERVER_ERROR);
+
+    var exception = Mockito.mock(TransactionSystemException.class);
+    var rootCause = Mockito.mock(Exception.class);
+    Mockito.when(exception.getRootCause()).thenReturn(rootCause);
+    Mockito.when(exception.getMessage())
+        .thenReturn("Test Exception"); // Due to side effects this is necessary
+
+    var actualResponse = advice.handleTransactionException(exception);
+
+    assert expectedResponse.equals(actualResponse);
+  }
+
+  @Test(
+      description =
+          "When the cause is a MismatchedInputException, "
+              + "handleHttpNotReadableException should yield a response with a 400 Bad Request Status "
+              + "and containing a GenericError exposing the cause's message")
+  public void testHandleHttpNotReadableExceptionWhenMismatchedInput() {
+    var expectedError =
+        GenericError.builder()
+            .message("One or more input values was in an unreadable format")
+            .code(HttpStatus.BAD_REQUEST.value())
+            .details(Collections.singletonList("TEST1"))
+            .build();
+
+    var expectedResponse = new ResponseEntity<>(expectedError, HttpStatus.BAD_REQUEST);
+
+    var exception = Mockito.mock(HttpMessageNotReadableException.class);
+    var cause = Mockito.mock(MismatchedInputException.class);
+    Mockito.when(exception.getCause()).thenReturn(cause);
+
+    Mockito.when(cause.getMessage()).thenReturn("TEST1");
+
+    var actualResponse = advice.handleHttpNotReadableException(exception);
+
+    assert expectedResponse.equals(actualResponse);
+  }
+
+  @Test(
+      description =
+          "When the cause is not a MismatchedInputException, "
+              + "handleHttpNotReadableException should yield a response with a 400 Bad Request Status "
+              + "and containing a GenericError indicating an unknown error")
+  public void testHandleHttpNotReadableExceptionWhenOtherCause() {
+    var expectedError =
+        GenericError.builder()
+            .message("An error occurred while processing the request")
+            .code(HttpStatus.BAD_REQUEST.value())
+            .build();
+
+    var expectedResponse = new ResponseEntity<>(expectedError, HttpStatus.BAD_REQUEST);
+
+    var exception = Mockito.mock(HttpMessageNotReadableException.class);
+    var cause = Mockito.mock(Exception.class);
+    Mockito.when(exception.getCause()).thenReturn(cause);
+
+    var actualResponse = advice.handleHttpNotReadableException(exception);
+
+    assert expectedResponse.equals(actualResponse);
+  }
+
+  @Test(
+      description =
+          "handleFallbackException should yield a GenericError with a 500 Internal Server Error Status "
+              + "and indicating an unknown error")
+  public void testHandleFallbackException() {
+    var expectedError =
+        GenericError.builder()
+            .message("An error occurred while processing the request")
+            .code(HttpStatus.INTERNAL_SERVER_ERROR.value())
+            .build();
+
+    assert expectedError.equals(advice.handleFallbackException(new Exception()));
   }
 
   private static String formatFieldRejection(
