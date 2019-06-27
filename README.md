@@ -24,10 +24,10 @@ Next, add an .env file and populate it with the same info you specified in the `
 Here's what your .env file should look like.
 
 ```$xslt
-JWT_KEY_STORE=classpath:server.jks
-JWT_KEY_STORE_PASS=74Ew4g77XGnFC
+JWT_KEY_STORE=classpath:mytest.jks
+JWT_KEY_STORE_PASS=mypass
 JWT_KEYPAIR_ALIAS=server
-JWT_KEYPAIR_PASS=74Ew4g77XGnFC
+JWT_KEYPAIR_PASS=mypass
 ```
 
 **TEMPORARY DEFAULT CREDENTIALS**: 
