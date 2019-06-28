@@ -91,9 +91,9 @@ The Java repository represents one of the possible backends that can be used.
 To connect a front-end application to the API, please see either the Angular or React tech challenge repositories.
 
   -  [Angular Repository](https://github.com/excellaco/tcp-angular)
-  - [React Repository]()
+  - [React Repository](https://github.com/excellaco/tcp-react)
 
-To use the Command-Line Interface (CLI), please download and setup the [CLI Repository]()
+To use the Command-Line Interface (CLI), please download and setup the [CLI Repository](https://github.com/excellaco/xg)
 
 ##### 6.  Reactive Web Frameworks
 
