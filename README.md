@@ -86,7 +86,7 @@ Also, please ensure Flyway migrations are running. They include the DB setup for
 
 The Java repository represents one of the possible backends that can be used.
 
-![Tech Challenge Architecture Diagram](https://files.slack.com/files-pri/T028RKY0B-FKSCMF525/image.png)
+![Tech Challenge Architecture Diagram](architechture.png)
 
 To connect a front-end application to the API, please see either the Angular or React tech challenge repositories.
 
