@@ -12,7 +12,6 @@ pipeline {
         }
         stage('Unit Tests') {
             steps {
-                sh 'java -version'
                 gradlew('test')
             }
             post {
