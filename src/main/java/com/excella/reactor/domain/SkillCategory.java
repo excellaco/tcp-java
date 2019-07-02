@@ -2,6 +2,7 @@ package com.excella.reactor.domain;
 
 import javax.persistence.Entity;
 import javax.persistence.Table;
+import javax.validation.constraints.NotEmpty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -10,5 +11,5 @@ import lombok.EqualsAndHashCode;
 @Entity
 @Table(name = "skill_category")
 public class SkillCategory extends DomainModel {
-  private String name;
+  @NotEmpty private String name;
 }

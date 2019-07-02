@@ -20,3 +20,17 @@ spring:
 server.servlet.context-path: /api
 
 
+
+
+
+
+security:
+  oauth2:
+    client:
+      client-id: app
+      client-secret: $2a$04$hqawBldLsWkFJ5CVsvtL7ed1z9yeoknfuszPOEHWzxfLBoViK6OVi
+  jwt:
+    key-store: "${JWT_KEY_STORE}"
+    key-store-password: "${JWT_KEY_STORE_PASS}"
+    key-pair-alias: "${JWT_KEYPAIR_ALIAS}"
+    key-pair-password: "${JWT_KEYPAIR_PASS}"

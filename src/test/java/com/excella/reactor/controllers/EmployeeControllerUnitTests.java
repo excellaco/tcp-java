@@ -24,9 +24,9 @@ public class EmployeeControllerUnitTests {
 
   @Test
   public void getAll_can_return_flux_of_multiple_employees() {
-    when(mockService.all()).thenReturn(Flux.just(mockEmployee1, mockEmployee2, mockEmployee3));
+    when(mockService.all(null)).thenReturn(Flux.just(mockEmployee1, mockEmployee2, mockEmployee3));
 
-    StepVerifier.create(employeeController.getAll())
+    StepVerifier.create(employeeController.getAll(null))
         .expectNextSequence(Arrays.asList(mockEmployee1, mockEmployee2, mockEmployee3))
         .expectComplete()
         .verify();
@@ -34,8 +34,8 @@ public class EmployeeControllerUnitTests {
 
   @Test
   public void getAll_can_return_flux_of_no_employees() {
-    when(mockService.all()).thenReturn(Flux.empty());
+    when(mockService.all(null)).thenReturn(Flux.empty());
 
-    StepVerifier.create(employeeController.getAll()).expectComplete().verify();
+    StepVerifier.create(employeeController.getAll(null)).expectComplete().verify();
   }
 }
