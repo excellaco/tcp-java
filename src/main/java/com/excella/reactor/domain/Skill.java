@@ -1,7 +1,14 @@
 package com.excella.reactor.domain;
 
-import javax.persistence.*;
-import lombok.*;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
@@ -14,11 +21,11 @@ import org.hibernate.annotations.OnDeleteAction;
 @EqualsAndHashCode(callSuper = true)
 @Entity
 public class Skill extends DomainModel {
-  @Id private Long id;
-  private String name;
+  @NotEmpty private String name;
 
   @ManyToOne(fetch = FetchType.EAGER, optional = false)
   @JoinColumn(name = "category_id")
   @OnDelete(action = OnDeleteAction.CASCADE)
+  @NotNull
   private SkillCategory category;
 }

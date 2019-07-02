@@ -1,6 +1,7 @@
 package com.excella.reactor.domain;
 
 import javax.persistence.Embeddable;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import lombok.Data;
 
@@ -11,8 +12,9 @@ public class Address {
   private String line2;
   private String city;
 
+  @NotNull
   @Size(min = 2, max = 2)
-  private String stateCode; // temporary
+  private String stateCode;
 
   private String zipCode;
 }

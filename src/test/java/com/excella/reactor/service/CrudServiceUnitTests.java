@@ -1,13 +1,15 @@
 package com.excella.reactor.service;
 
+import com.excella.reactor.common.exceptions.ResourceNotFoundException;
 import com.excella.reactor.shared.SampleEntity;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 import java.util.Optional;
 import org.mockito.ArgumentMatchers;
 import org.mockito.Mockito;
-import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -15,27 +17,29 @@ import reactor.test.StepVerifier;
 
 public class CrudServiceUnitTests {
 
-  private CrudRepository<SampleEntity, Long> mockRepository;
+  private JpaRepository<SampleEntity, Long> mockRepository;
 
   private class SampleCrudService implements CrudService<SampleEntity> {
 
     @Override
-    public CrudRepository<SampleEntity, Long> getRepository() {
+    public JpaRepository<SampleEntity, Long> getRepository() {
       return mockRepository;
     }
   }
 
+  private Pageable pageable = null;
+  private Page page = null;
   private SampleCrudService sampleService;
   private SampleEntity sampleEntity1 = new SampleEntity();
   private SampleEntity sampleEntity2 = new SampleEntity();
   private SampleEntity sampleEntity3 = new SampleEntity();
-  private List<SampleEntity> sampleEntityList;
+  private Page<SampleEntity> sampleEntityList;
 
   @BeforeMethod
   private void beforeEach() {
     sampleService = new SampleCrudService();
-    mockRepository = Mockito.mock(CrudRepository.class);
-    sampleEntityList = Arrays.asList(sampleEntity1, sampleEntity2, sampleEntity3);
+    mockRepository = Mockito.mock(JpaRepository.class);
+    sampleEntityList = new PageImpl<>(Arrays.asList(sampleEntity1, sampleEntity2, sampleEntity3));
   }
 
   @AfterMethod
@@ -46,22 +50,26 @@ public class CrudServiceUnitTests {
   // all
   @Test
   private void all_method_can_return_empty_flux() {
-    Mockito.when(mockRepository.findAll()).thenReturn(new ArrayList<>());
-    StepVerifier.create(sampleService.all()).verifyComplete();
+    Mockito.when(mockRepository.findAll(pageable)).thenReturn(page);
+    StepVerifier.create(sampleService.all(null)).verifyComplete();
   }
 
   @Test
   private void all_method_can_return_flux_with_multiple_entities() {
-    Mockito.when(mockRepository.findAll()).thenReturn(sampleEntityList);
-    StepVerifier.create(sampleService.all()).expectNextSequence(sampleEntityList).verifyComplete();
+    Mockito.when(mockRepository.findAll(pageable)).thenReturn(sampleEntityList);
+    StepVerifier.create(sampleService.all(null))
+        .expectNextSequence(sampleEntityList)
+        .verifyComplete();
   }
 
   // byId
 
   @Test
-  private void byId_can_return_nothing_when_no_matching_instance_found() {
-    Mockito.when(mockRepository.findById(Mockito.anyLong())).thenReturn(null);
-    StepVerifier.create(sampleService.byId(1234L)).verifyComplete();
+  private void byId_throws_ResourceNotFoundException_if_nothing_found() {
+    Mockito.when(mockRepository.findById(Mockito.anyLong())).thenReturn(Optional.empty());
+    StepVerifier.create(sampleService.byId(1234L))
+        .expectError(ResourceNotFoundException.class)
+        .verify();
   }
 
   @Test
@@ -80,17 +88,18 @@ public class CrudServiceUnitTests {
 
   // update
   @Test
-  private void update_returns_empty_mono_and_does_not_save_new_entity_when_no_matching_id_found() {
+  private void
+      update_throws_ResourceNotFoundException_and_does_not_save_new_entity_when_no_matching_id_found() {
     Mockito.when(mockRepository.save(Mockito.any())).thenReturn(sampleEntity1);
     Mockito.when(mockRepository.findById(Mockito.any())).thenReturn(Optional.empty());
 
-    StepVerifier.create(sampleService.update(1234L, sampleEntity1)).verifyComplete();
+    StepVerifier.create(sampleService.update(1234L, sampleEntity1))
+        .expectError(ResourceNotFoundException.class)
+        .verify();
 
     Mockito.verify(mockRepository, Mockito.never()).save(ArgumentMatchers.any());
   }
 
-  // failing on purpose temporarily (mockrepository.save should have sampleentity1 not
-  // sampleentity2)
   @Test
   private void update_returns_mono_with_updated_entity_and_saves_when_matching_id_found() {
 
@@ -106,10 +115,12 @@ public class CrudServiceUnitTests {
   // delete
 
   @Test
-  private void delete_does_nothing_when_no_matching_entity_is_found() {
+  private void delete_throws_ResourceNotFoundException_when_no_matching_entity_is_found() {
     Mockito.when(mockRepository.findById(1234L)).thenReturn(Optional.empty());
 
-    StepVerifier.create(sampleService.delete(1234L)).verifyComplete();
+    StepVerifier.create(sampleService.delete(1234L))
+        .expectError(ResourceNotFoundException.class)
+        .verify();
 
     Mockito.verify(mockRepository, Mockito.never()).delete(ArgumentMatchers.any());
   }
