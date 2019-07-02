@@ -9,17 +9,13 @@ A CRUD example using Spring WebFlux and Java 11
 ##### 2. Setup the application
 This project uses OAuth2 and JWT for authentication / authorization.
 
-In order for this to work correctly, you must create a .jks file in the classpath using the following command:
+In order for this to work correctly, you must create a .jks file in the classpath (i.e., in src/main/resources) using the following command:
 ```
-keytool -genkeypair -alias server 
-                    -keyalg RSA 
-                    -keypass mypass 
-                    -keystore mytest.jks 
-                    -storepass mypass
+keytool -genkeypair -alias server -keyalg RSA -keypass mypass -keystore mytest.jks -storepass mypass
 ```
 Note: it's recommended you use the values in the application.yml file. 
 
-Next, add an .env file and populate it with the same info you specified in the `keytool` command above.
+Next, add an .env file in the project root and populate it with the same info you specified in the `keytool` command above.
 
 Here's what your .env file should look like.
 
