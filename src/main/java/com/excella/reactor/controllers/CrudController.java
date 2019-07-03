@@ -64,6 +64,7 @@ public abstract class CrudController<T extends DomainModel> {
 
   /**
    * removes an object from the database by id
+   *
    * @param id id of the object to delete
    * @return Publisher of the object that was removed
    */
@@ -74,6 +75,7 @@ public abstract class CrudController<T extends DomainModel> {
 
   /**
    * get the CRUD service associated with this controller
+   *
    * @return the service
    */
   abstract CrudService<T> getService();

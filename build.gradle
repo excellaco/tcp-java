@@ -35,13 +35,19 @@ jacocoTestReport {
 		csv.enabled false
 		html.destination file("${buildDir}/jacocoHtml")
 	}
+
+	afterEvaluate {
+		classDirectories = files(classDirectories.files.collect {
+			fileTree(dir: it, exclude: 'com/excella/reactor/config/**')
+		})
+	}
 }
 
 jacocoTestCoverageVerification {
 	violationRules {
 		rule {
 			element = 'CLASS'
-			excludes = ["**/config/**"]
+			excludes = ["com/excella/reactor/config/**"]
 			limit {
 				minimum = 0.0
 			}
