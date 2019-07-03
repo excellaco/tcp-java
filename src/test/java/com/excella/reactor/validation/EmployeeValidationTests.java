@@ -43,7 +43,7 @@ public class EmployeeValidationTests {
 
     contact.setAddress(address);
     contact.setEmail("john.doe@test.com");
-    contact.setPhoneNumber("5715555555");
+    contact.setPhoneNumber("(571)555-5555");
 
     address.setLine1("1 Fake St");
     address.setCity("Portsmouth");

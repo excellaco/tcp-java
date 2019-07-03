@@ -16,7 +16,7 @@ public class Contact implements Serializable {
   @NotEmpty @Email private String email;
 
   @NotNull
-  @Pattern(regexp = "\\d{10}", message = "Phone number must consist of 10 digits")
+  @Pattern(regexp = "\\(\\d{3}\\)\\d{3}-\\d{4}", message = "Phone number must be of form (xxx)xxx-xxxx")
   private String phoneNumber;
 
   @Embedded @Valid @NotNull private Address address;

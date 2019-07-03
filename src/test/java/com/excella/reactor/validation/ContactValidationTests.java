@@ -24,7 +24,7 @@ public class ContactValidationTests {
     var address = new Address();
 
     contact.setAddress(address);
-    contact.setPhoneNumber("5715555555");
+    contact.setPhoneNumber("(571)555-5555");
     contact.setEmail("john.doe@test.com");
 
     address.setStateCode("VA");
