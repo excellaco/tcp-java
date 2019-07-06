@@ -1,5 +1,7 @@
 pipeline {
-    agent any
+    agent {
+      label 'excellanator'
+    }
     tools {
         jdk "11"
     }
@@ -12,7 +14,6 @@ pipeline {
         }
         stage('Unit Tests') {
             steps {
-                sh 'java -version'
                 gradlew('testNG')
             }
             post {
