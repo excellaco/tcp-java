@@ -38,7 +38,7 @@ jacocoTestReport {
 
 	afterEvaluate {
 		classDirectories = files(classDirectories.files.collect {
-			fileTree(dir: it, exclude: ['com/excella/reactor/config/**', 'com/excella/reactor/ReactorApplication.class'])
+			fileTree(dir: it, exclude: ['com/excella/reactor/config/**', 'com/excella/reactor/ReactorApplication.class', 'com/excella/reactor/common/reactor/MonoUtils.class'])
 		})
 	}
 }
@@ -47,7 +47,7 @@ jacocoTestCoverageVerification {
 	violationRules {
 		rule {
 			element = 'CLASS'
-			excludes = ["com/excella/reactor/config/**", "com.excella.reactor.ReactorApplication.class"]
+			excludes = ["com/excella/reactor/config/**", "com.excella.reactor.ReactorApplication.class", "com/excella/reactor/common/reactor/MonoUtils.class"]
 			limit {
 				minimum = 0.0
 			}

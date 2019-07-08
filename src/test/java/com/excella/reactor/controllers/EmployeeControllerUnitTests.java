@@ -20,9 +20,6 @@ public class EmployeeControllerUnitTests {
   EmployeeController employeeController = new EmployeeController(mockService);
 
   @Test
-  public void contextLoads() {}
-
-  @Test
   public void getAll_can_return_flux_of_multiple_employees() {
     when(mockService.all(null)).thenReturn(Flux.just(mockEmployee1, mockEmployee2, mockEmployee3));
 

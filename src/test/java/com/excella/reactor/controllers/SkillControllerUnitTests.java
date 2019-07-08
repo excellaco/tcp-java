@@ -32,9 +32,6 @@ public class SkillControllerUnitTests {
     }
 
     @Test
-    public void contextLoads() {}
-
-    @Test
     public void getAll_can_return_flux_of_multiple_skills() {
         when(mockService.all(null)).thenReturn(Flux.just(skill1, skill2, skill3));
 

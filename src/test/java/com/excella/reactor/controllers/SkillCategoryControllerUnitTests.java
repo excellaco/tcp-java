@@ -32,9 +32,6 @@ public class SkillCategoryControllerUnitTests {
     }
 
     @Test
-    public void contextLoads() {}
-
-    @Test
     public void getAll_can_return_flux_of_multiple_skill_categories() {
         when(mockService.all(null)).thenReturn(Flux.just(cat1, cat2, cat3));
 
