@@ -15,7 +15,7 @@ services:
       DB_HOST: db
       DB_PORT: 5432
       DB_USER: api_user
-      DB_PASSWORD: api_passwor
+      DB_PASSWORD: api_password
       JWT_KEY_STORE: ${JWT_KEY_STORE}
       JWT_KEY_STORE_PASS: ${JWT_KEY_STORE_PASS}
       JWT_KEYPAIR_ALIAS: ${JWT_KEYPAIR_ALIAS}
