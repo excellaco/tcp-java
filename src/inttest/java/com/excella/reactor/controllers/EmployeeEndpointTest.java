@@ -33,7 +33,7 @@ public class EmployeeEndpointTest extends AbstractTestNGSpringContextTests {
   @Autowired private TestSecUtils testSecUtils;
   @Autowired private EmployeeController employeeController;
 
-  private static final String ENDPOINT = "/employee/"; // trailing slash required
+  private static final String ENDPOINT = "/employee";
   private Employee employee;
   private String authToken;
 
