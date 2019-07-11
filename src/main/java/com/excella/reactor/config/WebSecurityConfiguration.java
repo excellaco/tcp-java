@@ -57,21 +57,4 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
     return passwordEncoder;
   }
 
-  /**
-   * Overrides default implementation and sets up UserDetailsService using default JdbcDaoImpl and
-   * sets the datasource to the application's default (in this case, it's Postgres). See the
-   * properties under spring.datasource in the application.yml.
-   *
-   * @see WebSecurityConfigurerAdapter#userDetailsServiceBean()
-   * @return UserDetailsService
-   */
-  //  @Bean
-  //  @Override
-  //  public UserDetailsService userDetailsService() {
-  //    if (userDetailsService == null) {
-  //      userDetailsService = new JdbcDaoImpl();
-  //      ((JdbcDaoImpl) userDetailsService).setDataSource(dataSource);
-  //    }
-  //    return userDetailsService;
-  //  }
 }
