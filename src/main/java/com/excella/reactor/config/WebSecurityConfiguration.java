@@ -1,13 +1,11 @@
 package com.excella.reactor.config;
 
-import javax.sql.DataSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.jdbc.JdbcDaoImpl;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
@@ -67,13 +65,13 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
    * @see WebSecurityConfigurerAdapter#userDetailsServiceBean()
    * @return UserDetailsService
    */
-//  @Bean
-//  @Override
-//  public UserDetailsService userDetailsService() {
-//    if (userDetailsService == null) {
-//      userDetailsService = new JdbcDaoImpl();
-//      ((JdbcDaoImpl) userDetailsService).setDataSource(dataSource);
-//    }
-//    return userDetailsService;
-//  }
+  //  @Bean
+  //  @Override
+  //  public UserDetailsService userDetailsService() {
+  //    if (userDetailsService == null) {
+  //      userDetailsService = new JdbcDaoImpl();
+  //      ((JdbcDaoImpl) userDetailsService).setDataSource(dataSource);
+  //    }
+  //    return userDetailsService;
+  //  }
 }

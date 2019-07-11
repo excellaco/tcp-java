@@ -1,18 +1,17 @@
 package com.excella.reactor.domain;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
-import org.springframework.security.core.GrantedAuthority;
-
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
+import org.springframework.security.core.GrantedAuthority;
 
 @Data
 @NoArgsConstructor
@@ -27,7 +26,5 @@ public class UserAuthority implements GrantedAuthority {
   @JsonBackReference
   private User user;
 
-  @Id
-  private String authority;
-
+  @Id private String authority;
 }
