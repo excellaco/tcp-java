@@ -13,7 +13,6 @@ import lombok.extern.slf4j.Slf4j;
 @EqualsAndHashCode(callSuper = true, exclude = "skills")
 @ToString(exclude = "skills")
 @NoArgsConstructor
-@Slf4j
 @Entity
 public class Employee extends DomainModel {
   @Embedded @Valid @NotNull private Bio bio;
@@ -27,5 +26,5 @@ public class Employee extends DomainModel {
       cascade = CascadeType.ALL,
       orphanRemoval = true)
   @NotEmpty
-  List<@Valid @NotNull EmployeeSkill> skills;
+  private List<@Valid @NotNull EmployeeSkill> skills;
 }

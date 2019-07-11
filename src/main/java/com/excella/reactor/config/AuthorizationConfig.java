@@ -1,18 +1,28 @@
 package com.excella.reactor.config;
 
 import java.security.KeyPair;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 import javax.sql.DataSource;
+
+import com.excella.reactor.domain.User;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.common.DefaultOAuth2AccessToken;
+import org.springframework.security.oauth2.common.OAuth2AccessToken;
 import org.springframework.security.oauth2.config.annotation.configurers.ClientDetailsServiceConfigurer;
 import org.springframework.security.oauth2.config.annotation.web.configuration.AuthorizationServerConfigurerAdapter;
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableAuthorizationServer;
 import org.springframework.security.oauth2.config.annotation.web.configurers.AuthorizationServerEndpointsConfigurer;
 import org.springframework.security.oauth2.config.annotation.web.configurers.AuthorizationServerSecurityConfigurer;
 import org.springframework.security.oauth2.provider.ClientDetailsService;
+import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.security.oauth2.provider.token.DefaultTokenServices;
 import org.springframework.security.oauth2.provider.token.TokenStore;
 import org.springframework.security.oauth2.provider.token.store.JwtAccessTokenConverter;
@@ -84,11 +94,21 @@ public class AuthorizationConfig extends AuthorizationServerConfigurerAdapter {
     if (jwtAccessTokenConverter != null) {
       return jwtAccessTokenConverter;
     }
-
+    jwtAccessTokenConverter = new JwtAccessTokenConverter(){
+      @Override
+      public OAuth2AccessToken enhance(OAuth2AccessToken accessToken, OAuth2Authentication authentication) {
+        if(authentication.getOAuth2Request().getGrantType().equalsIgnoreCase("password")
+            && authentication.getPrincipal() instanceof User) {
+          ((DefaultOAuth2AccessToken) accessToken).setAdditionalInformation(Map.of("email", ((User)authentication.getPrincipal()).getEmail()));
+        }
+        accessToken = super.enhance(accessToken, authentication);
+        ((DefaultOAuth2AccessToken) accessToken).setAdditionalInformation(Collections.emptyMap());
+        return accessToken;
+      }
+    };
     SecurityProperties.JwtProperties jwtProperties = securityProperties.getJwt();
     KeyPair keyPair = keyPair(jwtProperties, keyStoreKeyFactory(jwtProperties));
 
-    jwtAccessTokenConverter = new JwtAccessTokenConverter();
     jwtAccessTokenConverter.setKeyPair(keyPair);
     return jwtAccessTokenConverter;
   }

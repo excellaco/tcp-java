@@ -14,13 +14,11 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 @EnableWebSecurity
 public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
 
-  private final DataSource dataSource;
-
   private PasswordEncoder passwordEncoder;
   private UserDetailsService userDetailsService;
 
-  public WebSecurityConfiguration(final DataSource dataSource) {
-    this.dataSource = dataSource;
+  public WebSecurityConfiguration(final UserDetailsService userDetailsService) {
+    this.userDetailsService = userDetailsService;
   }
 
   /**
@@ -33,7 +31,7 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
    */
   @Override
   protected void configure(final AuthenticationManagerBuilder auth) throws Exception {
-    auth.userDetailsService(userDetailsService()).passwordEncoder(passwordEncoder());
+    auth.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder());
   }
 
   /**
@@ -69,13 +67,13 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
    * @see WebSecurityConfigurerAdapter#userDetailsServiceBean()
    * @return UserDetailsService
    */
-  @Bean
-  @Override
-  public UserDetailsService userDetailsService() {
-    if (userDetailsService == null) {
-      userDetailsService = new JdbcDaoImpl();
-      ((JdbcDaoImpl) userDetailsService).setDataSource(dataSource);
-    }
-    return userDetailsService;
-  }
+//  @Bean
+//  @Override
+//  public UserDetailsService userDetailsService() {
+//    if (userDetailsService == null) {
+//      userDetailsService = new JdbcDaoImpl();
+//      ((JdbcDaoImpl) userDetailsService).setDataSource(dataSource);
+//    }
+//    return userDetailsService;
+//  }
 }
