@@ -2,7 +2,6 @@ package com.excella.reactor.controllers;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.excella.reactor.domain.*;
@@ -15,7 +14,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
@@ -116,8 +114,7 @@ public class EmployeeEndpointTest extends AbstractTestNGSpringContextTests {
   public void getSuccess() throws Exception {
     mockMvc
         .perform(
-            get(ENDPOINT)
-                .header(HttpHeaders.AUTHORIZATION, String.format("Bearer %s", authToken)))
+            get(ENDPOINT).header(HttpHeaders.AUTHORIZATION, String.format("Bearer %s", authToken)))
         .andExpect(status().is2xxSuccessful());
   }
 }
