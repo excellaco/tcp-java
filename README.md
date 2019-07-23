@@ -25,12 +25,14 @@ docker-compose --version```
     - ProjectName (for Gradle)
     - GroupName (for Gradle; typically "com.excella")
   - run `xg make`
-    - Note: in order for `xg` to connect to the git repo on github, your key for that repo *must* be in `~/.ssh/id_rsa`; if it's not, remember to move your existing `id_rsa` out of the way before copying the github key to `~/.ssh/id_rsa`!  `xg` respects neither `~/.ssh/config` nor `~/.netrc`. Failure will result in the error message `Error: Unable to clone repository remote`
+    - Note: if your private key for the tcp-java GitHub repo is not in `~/.ssh/id_rsa`, specify it with the '-i' or '--identity' flag:
+      `xg make -i ~/.ssh/my_github_key`
+    - Note: We strongly recommend using `xg` 0.2.1 or later. In order for `xg` versions < 0.2.1 to connect to the git repo on GitHub, your key for that repo *must* be in `~/.ssh/id_rsa`; if it's not, remember to move your existing `id_rsa` out of the way before copying the GitHub key to `~/.ssh/id_rsa`!  `xg <= 0.2.0` respects neither `~/.ssh/config` nor `~/.netrc`. Failure will result in the error message `Error: Unable to clone repository remote`.
     - This will list a bunch of files and directories, prefixed with "F" for a file, "T" for a template, and "D" for a directory.
     - The result is in a subdirectory whose name is the same as the projectName you specified in `xg.yaml`.  Here we assume it's called my-project.
     - The result is *not* a Git workspace: there's no `.git` subdirectory.
   - Work around minor current `xg` limitations:
-    - `chmod a+x start test gradlew` # xg doesn't remember these are executable
+    - `chmod a+x start test gradlew` # xg < 0.2.1 doesn't remember these are executable
     - `cp -p xg.yaml my-project` # xg puts the version of xg.yaml as found in the repo under my-project
 
 ##### 3. Setup the application
