@@ -1,4 +1,4 @@
-# tcp-java repository
+# {{.ProjectName}} repository
 
 A CRUD example using Spring WebFlux and Java 11
 
@@ -13,7 +13,7 @@ In order for this to work correctly, you must create a .jks file in the classpat
 ```
 keytool -genkeypair -alias server -keyalg RSA -keypass mypass -keystore mytest.jks -storepass mypass
 ```
-Note: it's recommended you use the values in the application.yml file.
+Note: it's recommended you use the values in the application.yml file. 
 
 Next, add an .env file in the project root and populate it with the same info you specified in the `keytool` command above.
 
@@ -26,7 +26,7 @@ JWT_KEYPAIR_ALIAS=server
 JWT_KEYPAIR_PASS=mypass
 ```
 
-**TEMPORARY DEFAULT CREDENTIALS**:
+**TEMPORARY DEFAULT CREDENTIALS**: 
 ```
 client-id: app
 client-secret: $2a$04$hqawBldLsWkFJ5CVsvtL7ed1z9yeoknfuszPOEHWzxfLBoViK6OVi
@@ -37,7 +37,7 @@ password: pass
 You must retrieve a token before hitting any other endpoints. To do so, create a POST request to `/oauth/token`. Use Basic Auth (with client id and secret) in the header with the username, password, and grant_type in the payload.
 
 Also, please ensure Flyway migrations are running. They include the DB setup for OAuth2 and Users. See the following for more information
-
+ 
  - https://docs.spring.io/spring-security/site/docs/5.0.x/reference/html5/#appendix-schema
  - https://github.com/spring-projects/spring-security-oauth/blob/master/spring-security-oauth2/src/test/resources/schema.sql
 
@@ -69,13 +69,13 @@ Also, please ensure Flyway migrations are running. They include the DB setup for
     3. Search for Lombok Plugin.
     4. Click on Install plugin.
     5. Restart IntelliJ IDEA.
-
+    
 - Import the project
     1. Select `Import Project`
     2. Select the directory where you cloned the repository
     3. Import as a gradle project and select a JDK >= 11
     4. Select to use the gradle wrapper configuration from the project
-
+    
 
 
 ##### 5. Tech Challenge Architecture
@@ -88,6 +88,8 @@ To connect a front-end application to the API, please see either the Angular or 
 
   -  [Angular Repository](https://github.com/excellaco/tcp-angular)
   - [React Repository](https://github.com/excellaco/tcp-react)
+
+To use the Command-Line Interface (CLI), please download and setup the [CLI Repository](https://github.com/excellaco/xg)
 
 ##### 5. using the Command-Line Interface (CLI)
   - Download and setup the [TCP CLI](https://github.com/excellaco/xg)

@@ -1,0 +1,8 @@
+projectName: [project directory which will be created]
+templateRepo:
+  remote: git@github.com:excellaco/tcp-java.git
+  refName: master
+  
+variables:
+  ProjectName: [project name in gradle settings]
+  GroupName: [group name in gradle build]

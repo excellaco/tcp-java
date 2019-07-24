@@ -1,0 +1,139 @@
+plugins {
+	id 'org.springframework.boot' version '2.1.5.RELEASE'
+	id "io.franzbecker.gradle-lombok" version '3.0.0'
+	id 'com.github.sherter.google-java-format' version '0.8'
+	id 'jacoco'
+	id 'java'
+}
+
+apply plugin: 'io.spring.dependency-management'
+apply plugin: 'io.franzbecker.gradle-lombok'
+
+group = '{{.GroupName}}'
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = JavaVersion.VERSION_11
+targetCompatibility = JavaVersion.VERSION_11
+
+configurations {
+	compileOnly {
+		extendsFrom annotationProcessor
+	}
+	developmentOnly
+	runtimeClasspath {
+		extendsFrom developmentOnly
+	}
+}
+
+jacoco {
+	toolVersion = "0.8.3"
+	reportsDir = file("$buildDir/jacocoReportDir")
+}
+
+jacocoTestReport {
+	reports {
+		xml.enabled false
+		csv.enabled false
+		html.destination file("${buildDir}/jacocoHtml")
+	}
+
+	afterEvaluate {
+		classDirectories = files(classDirectories.files.collect {
+			fileTree(dir: it, exclude: ['com/excella/reactor/config/**', 'com/excella/reactor/ReactorApplication.class', 'com/excella/reactor/common/reactor/MonoUtils.class'])
+		})
+	}
+}
+
+jacocoTestCoverageVerification {
+	violationRules {
+		rule {
+			element = 'CLASS'
+			excludes = ["com/excella/reactor/config/**", "com.excella.reactor.ReactorApplication.class", "com/excella/reactor/common/reactor/MonoUtils.class"]
+			limit {
+				minimum = 0.0
+			}
+		}
+	}
+}
+
+repositories {
+	mavenCentral()
+}
+
+sourceSets {
+	inttest {
+		java
+		resources
+		compileClasspath +=  main.output + test.output
+		runtimeClasspath += main.output + test.output
+	}
+}
+
+configurations {
+	inttestCompile.extendsFrom testCompile
+	inttestRuntime.extendsFrom testRuntime
+	inttestImplementation.extendsFrom testImplementation
+
+}
+
+dependencies {
+	implementation 'org.springframework.boot:spring-boot-starter-actuator'
+	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+	implementation 'org.springframework.boot:spring-boot-starter-security'
+	implementation 'org.springframework.security.oauth.boot:spring-security-oauth2-autoconfigure:2.1.6.RELEASE'
+
+	implementation 'org.springframework.boot:spring-boot-starter-jetty'
+	implementation('org.springframework.boot:spring-boot-starter-web') {
+		exclude group: 'org.springframework.boot', module: 'spring-boot-starter-tomcat'
+	}
+
+	implementation 'org.springframework.boot:spring-boot-starter-webflux'
+	implementation 'org.springframework.boot:spring-boot-starter-logging'
+	implementation 'org.flywaydb:flyway-core'
+	implementation 'io.springfox:springfox-swagger2:2.9.2'
+	implementation 'io.springfox:springfox-swagger-ui:2.9.2'
+	implementation 'net.logstash.logback:logstash-logback-encoder:5.3'
+	implementation 'org.springframework.boot:spring-boot-configuration-processor'
+	implementation 'javax.persistence:javax.persistence-api:2.2'
+
+	developmentOnly "org.springframework.boot:spring-boot-devtools"
+	
+	runtimeOnly 'org.postgresql:postgresql'
+	annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
+
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+
+
+	testImplementation 'io.projectreactor:reactor-test'
+	testImplementation group: 'org.testng', name: 'testng', version: '6.14.3'
+	testImplementation 'org.mockito:mockito-inline:2.13.0'
+
+	inttestImplementation 'org.springframework.security:spring-security-test:5.1.5.RELEASE'
+	inttestRuntime 'org.springframework.boot:spring-boot-starter-test'
+	inttestRuntime 'org.mockito:mockito-inline:2.13.0'
+	inttestRuntime group: 'com.h2database', name: 'h2', version: '1.4.199'
+
+
+
+}
+
+task testNG(type: Test) {
+	useTestNG()
+	jacoco {
+		destinationFile = file("$buildDir/jacoco/test.exec")
+		excludes = ["**/config/**"]
+	}
+}
+
+task inttest(type: Test) {
+	useTestNG()
+	testClassesDirs = sourceSets.inttest.output.classesDirs
+	classpath = sourceSets.inttest.runtimeClasspath
+	outputs.upToDateWhen { false }
+	mustRunAfter testNG
+}
+
+test {
+	dependsOn testNG
+	dependsOn inttest
+}
+
