@@ -22,6 +22,11 @@ pipeline {
                 gradlew('clean')
             }
         }
+        stage('SonarQube analysis') {
+          withSonarQubeEnv() {
+            gradlew('sonarqube')
+          }
+        }
         stage('Unit Tests') {
             steps {
                 gradlew('testNG')
