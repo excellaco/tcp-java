@@ -23,8 +23,10 @@ pipeline {
             }
         }
         stage('SonarQube analysis') {
-          withSonarQubeEnv() {
-            gradlew('sonarqube')
+          steps{
+            withSonarQubeEnv() {
+              gradlew('sonarqube')
+            }
           }
         }
         stage('Unit Tests') {
