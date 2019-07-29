@@ -24,7 +24,7 @@ pipeline {
         }
         stage('SonarQube analysis') {
           steps{
-            withSonarQubeEnv(default) {
+            withSonarQubeEnv('default') {
               gradlew('sonarqube')
             }
           }
