@@ -123,8 +123,8 @@ sonarqube {
 				property "sonar.projectKey", "tcp-java"
 				property "sonar.java.binaries", "./build/classes/java"
 				property "sonar.tests", "./src/test"
-				property "sonar.junit.reportPaths", "./build/test-results/testNG"
-				property "sonar.jacoco.reportPath", "./build/jacoco/test.exec"
+				property "sonar.junit.reportPaths", "./build/test-results/testNG, ./build/test-results/inttest"
+				property "sonar.jacoco.reportPaths", "./build/jacoco/test.exec, /build/jacoco/inttest.exec"
 
     }
 }
