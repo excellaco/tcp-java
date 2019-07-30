@@ -4,6 +4,7 @@ plugins {
 	id 'com.github.sherter.google-java-format' version '0.8'
 	id 'jacoco'
 	id 'java'
+	id "org.sonarqube" version "2.7.1"
 }
 
 apply plugin: 'io.spring.dependency-management'
@@ -31,7 +32,7 @@ jacoco {
 
 jacocoTestReport {
 	reports {
-		xml.enabled false
+		xml.enabled true
 		csv.enabled false
 		html.destination file("${buildDir}/jacocoHtml")
 	}
@@ -96,7 +97,7 @@ dependencies {
 	implementation 'javax.persistence:javax.persistence-api:2.2'
 
 	developmentOnly "org.springframework.boot:spring-boot-devtools"
-	
+
 	runtimeOnly 'org.postgresql:postgresql'
 	annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
 
@@ -115,6 +116,19 @@ dependencies {
 
 
 }
+
+sonarqube {
+    properties {
+        property "sonar.sourceEncoding", "UTF-8"
+				property "sonar.projectKey", "tcp-java"
+				property "sonar.java.binaries", "./build/classes/java"
+				property "sonar.tests", "./src/test"
+				property "sonar.junit.reportPaths", "./build/test-results/testNG"
+				property "sonar.jacoco.reportPath", "./build/jacoco/test.exec"
+
+    }
+}
+
 
 task testNG(type: Test) {
 	useTestNG()
@@ -136,4 +150,3 @@ test {
 	dependsOn testNG
 	dependsOn inttest
 }
-
