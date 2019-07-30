@@ -148,4 +148,5 @@ task inttest(type: Test) {
 
 test {
 	dependsOn testNG
+	dependsOn inttest
 }
