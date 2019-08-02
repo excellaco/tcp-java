@@ -1,4 +1,7 @@
 [![Build Status](https://sandbox-tcp-jenkins.excellalabs.com/buildStatus/icon?job=TCP%2FJava%2Ftcp-java%2Fmaster)](https://sandbox-tcp-jenkins.excellalabs.com/job/TCP/job/Java/job/tcp-java/job/master/)
+[![Coverage](http://scgrt-rdso-jd-ecs-alb-867083871.us-west-1.elb.amazonaws.com:9000/api/project_badges/measure?project=tcp-java&metric=coverage)](http://scgrt-rdso-jd-ecs-alb-867083871.us-west-1.elb.amazonaws.com:9000/dashboard?id=tcp-java)
+[![Vulnerabilities](http://scgrt-rdso-jd-ecs-alb-867083871.us-west-1.elb.amazonaws.com:9000/api/project_badges/measure?project=tcp-java&metric=vulnerabilities)](http://scgrt-rdso-jd-ecs-alb-867083871.us-west-1.elb.amazonaws.com:9000/dashboard?id=tcp-java)
+
 
 # tcp-java repository
 
