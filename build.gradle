@@ -49,7 +49,7 @@ jacocoTestCoverageVerification {
 			element = 'CLASS'
 			excludes = ["com.excella.reactor.config.*", "com.excella.reactor.ReactorApplication", "com.excella.reactor.common.reactor.MonoUtils"]
 			limit {
-				minimum = 1.0
+				minimum = 0.8
 			}
 		}
 	}
