@@ -29,7 +29,7 @@ pipeline {
         }
         stage('Unit Tests') {
             steps {
-                gradlew('test')
+                gradlew('testNG')
             }
             post{
               always {
