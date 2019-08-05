@@ -12,6 +12,7 @@ A CRUD example using Spring WebFlux and Java 11
   - [docker](https://docs.docker.com/engine/installation/)
   - [docker-compose](https://docs.docker.com/compose/install/)
   - keytool: this is part of the JDK; if you don't already have it: `sudo apt-get install openjdk-11-jdk`
+      -For mac run: `brew cask install java`
 
 Docker (Engine) version 18.09.8 is known to work;
 docker-compose version 1.24.1 is known to work; docker-compose version 1.17.1 is known to NOT work.
