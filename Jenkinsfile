@@ -16,9 +16,14 @@ pipeline {
         jdk "11"
     }
     stages {
+        stage('Linter') {
+            steps {
+              slackSend(channel: '#tcp-java', color: '#FFFF00', message: ":jenkins-triggered: Build Triggered - ${env.JOB_NAME} ${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>)")
+              gradlew('verGJF')
+            }
+        }
         stage('Clean') {
             steps {
-                slackSend(channel: '#tcp-java', color: '#FFFF00', message: ":jenkins-triggered: Build Started - ${env.JOB_NAME} ${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>)")
                 gradlew('clean')
             }
         }
@@ -32,15 +37,32 @@ pipeline {
               }
             }
         }
+        stage('Jacoco') {
+            steps {
+                gradlew('jacocoTestReport')
+            }
+        }
+        stage('Jacoco Verficiation') {
+            steps {
+                gradlew('jacocoTestCoverageVerification')
+            }
+        }
+        stage('SonarQube analysis') {
+          steps{
+            withSonarQubeEnv('default') {
+              gradlew('sonarqube')
+            }
+          }
+        }
     }
     post {
         success {
-          setBuildStatus("Build succeeded", "SUCCESS");
-          slackSend(channel: '#tcp-java', color: '#00FF00', message: ":jenkins_ci: Build Successful!  ${env.JOB_NAME} ${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>) :jenkins_ci:")
+           setBuildStatus("Build succeeded", "SUCCESS");
+           slackSend(channel: '#tcp-java', color: '#00FF00', message: ":jenkins_ci: Build Successful!  ${env.JOB_NAME} ${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>) :jenkins_ci:")
         }
         failure {
-          setBuildStatus("Build failed", "FAILURE");
-          slackSend(channel: '#tcp-java', color: '#FF0000', message: ":alert: :jenkins_exploding: *Build Failed!  WHO BROKE THE FREAKING CODE??* ${env.JOB_NAME} ${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>) :jenkins_exploding: :alert:")
+           setBuildStatus("Build failed", "FAILURE");
+           slackSend(channel: '#tcp-java', color: '#FF0000', message: ":alert: :jenkins_exploding: *Build Failed!  WHO BROKE THE FREAKING CODE??* ${env.JOB_NAME} ${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>) :jenkins_exploding: :alert:")
         }
     }
 }

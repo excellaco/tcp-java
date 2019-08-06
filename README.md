@@ -1,3 +1,8 @@
+[![Build Status](https://sandbox-tcp-jenkins.excellalabs.com/buildStatus/icon?job=TCP%2FJava%2Ftcp-java%2Fmaster)](https://sandbox-tcp-jenkins.excellalabs.com/job/TCP/job/Java/job/tcp-java/job/master/)
+[![Coverage](http://scgrt-rdso-jd-ecs-alb-867083871.us-west-1.elb.amazonaws.com:9000/api/project_badges/measure?project=tcp-java&metric=coverage)](http://scgrt-rdso-jd-ecs-alb-867083871.us-west-1.elb.amazonaws.com:9000/dashboard?id=tcp-java)
+[![Vulnerabilities](http://scgrt-rdso-jd-ecs-alb-867083871.us-west-1.elb.amazonaws.com:9000/api/project_badges/measure?project=tcp-java&metric=vulnerabilities)](http://scgrt-rdso-jd-ecs-alb-867083871.us-west-1.elb.amazonaws.com:9000/dashboard?id=tcp-java)
+
+
 # tcp-java repository
 
 A CRUD example using Spring WebFlux and Java 11
@@ -6,7 +11,8 @@ A CRUD example using Spring WebFlux and Java 11
 ##### 1. Install:
   - [docker](https://docs.docker.com/engine/installation/)
   - [docker-compose](https://docs.docker.com/compose/install/)
-  - keytool: this is part of the JDK; if you don't already have it: `sudo apt-get install jdk-1.11-something` (maybe)
+  - keytool: this is part of the JDK; if you don't already have it: `sudo apt-get install openjdk-11-jdk`
+      -For mac run: `brew cask install java`
 
 Docker (Engine) version 18.09.8 is known to work;
 docker-compose version 1.24.1 is known to work; docker-compose version 1.17.1 is known to NOT work.
