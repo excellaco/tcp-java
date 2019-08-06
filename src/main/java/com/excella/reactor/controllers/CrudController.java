@@ -2,6 +2,8 @@ package com.excella.reactor.controllers;
 
 import com.excella.reactor.domain.DomainModel;
 import com.excella.reactor.service.CrudService;
+import com.excella.reactor.validation.groups.PostChecks;
+import javax.validation.groups.Default;
 import lombok.extern.slf4j.Slf4j;
 import org.reactivestreams.Publisher;
 import org.springframework.data.domain.Pageable;
@@ -44,7 +46,7 @@ public abstract class CrudController<T extends DomainModel> {
    * @return Publisher providing the newly created object
    */
   @PostMapping(value = "", name = "Add a new resource item", produces = "application/json")
-  Publisher<T> create(@RequestBody @Validated T t) {
+  Publisher<T> create(@RequestBody @Validated({PostChecks.class, Default.class}) T t) {
     return getService()
         .save(t)
         .doOnSubscribe(result -> log.info("Adding new item {}", t.toString()));
