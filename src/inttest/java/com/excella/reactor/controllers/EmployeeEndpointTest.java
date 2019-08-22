@@ -4,7 +4,16 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.excella.reactor.domain.*;
+import com.excella.reactor.domain.Address;
+import com.excella.reactor.domain.Bio;
+import com.excella.reactor.domain.Contact;
+import com.excella.reactor.domain.Employee;
+import com.excella.reactor.domain.EmployeeSkill;
+import com.excella.reactor.domain.Ethnicity;
+import com.excella.reactor.domain.Gender;
+import com.excella.reactor.domain.Skill;
+import com.excella.reactor.domain.SkillCategory;
+import com.excella.reactor.domain.SkillProficiency;
 import com.excella.reactor.util.TestSecUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.net.HttpHeaders;
