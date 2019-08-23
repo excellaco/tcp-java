@@ -23,7 +23,6 @@ import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Ignore;
 import org.testng.annotations.Test;
 
-@Test
 @SpringBootTest
 @WebAppConfiguration
 @AutoConfigureMockMvc
@@ -81,7 +80,7 @@ public class SkillEndpointTest extends AbstractTestNGSpringContextTests {
         .andExpect(status().is2xxSuccessful());
   }
 
-  @Test(description = "Should successfully get all skills with no pagination.")
+  @Test(priority = 1, description = "Should successfully get all skills with no pagination.")
   public void getSuccess() throws Exception {
     mockMvc
         .perform(
@@ -91,7 +90,7 @@ public class SkillEndpointTest extends AbstractTestNGSpringContextTests {
             jsonPath("$._embedded.skills", hasSize(24))); // there are 24 skills in the mock data
   }
 
-  @Test(description = "Ensure pagination is working")
+  @Test(priority = 1, description = "Ensure pagination is working")
   public void getPagination() throws Exception {
     var pageSizes = new int[] {1, 2, 3, 5, 8, 13, 20, 21};
     for (int pageSize : pageSizes) {

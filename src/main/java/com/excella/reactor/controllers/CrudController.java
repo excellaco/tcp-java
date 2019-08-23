@@ -25,7 +25,7 @@ public abstract class CrudController<T extends DomainModel> {
    * @return Publisher of all resources of type T
    */
   @GetMapping(value = "", name = "Get all of resource", produces = "application/json")
-  Publisher<T> getAll(@PageableDefault(size = Integer.MAX_VALUE) Pageable pageable) {
+  Publisher<T> getAll(@PageableDefault(Integer.MAX_VALUE) Pageable pageable) {
     return getService().all(pageable).doOnSubscribe(result -> log.info("Getting all"));
   }
 
