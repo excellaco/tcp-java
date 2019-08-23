@@ -1,3 +1,8 @@
+[![Build Status](https://sandbox-tcp-jenkins.excellalabs.com/buildStatus/icon?job=TCP%2FJava%2F{{.ProjectName}}%2Fmaster)](https://sandbox-tcp-jenkins.excellalabs.com/job/TCP/job/Java/job/{{.ProjectName}}/job/master/)
+[![Coverage](http://scgrt-rdso-jd-ecs-alb-867083871.us-west-1.elb.amazonaws.com:9000/api/project_badges/measure?project={{.ProjectName}}&metric=coverage)](http://scgrt-rdso-jd-ecs-alb-867083871.us-west-1.elb.amazonaws.com:9000/dashboard?id={{.ProjectName}})
+[![Vulnerabilities](http://scgrt-rdso-jd-ecs-alb-867083871.us-west-1.elb.amazonaws.com:9000/api/project_badges/measure?project={{.ProjectName}}&metric=vulnerabilities)](http://scgrt-rdso-jd-ecs-alb-867083871.us-west-1.elb.amazonaws.com:9000/dashboard?id={{.ProjectName}})
+
+
 # {{.ProjectName}} repository
 
 A CRUD example using Spring WebFlux and Java 11
@@ -6,7 +11,8 @@ A CRUD example using Spring WebFlux and Java 11
 ##### 1. Install:
   - [docker](https://docs.docker.com/engine/installation/)
   - [docker-compose](https://docs.docker.com/compose/install/)
-  - keytool: this is part of the JDK; if you don't already have it: `sudo apt-get install jdk-1.11-something` (maybe)
+  - keytool: this is part of the JDK; if you don't already have it: `sudo apt-get install openjdk-11-jdk`
+      -For mac run: `brew cask install java`
 
 Docker (Engine) version 18.09.8 is known to work;
 docker-compose version 1.24.1 is known to work; docker-compose version 1.17.1 is known to NOT work.
@@ -184,4 +190,116 @@ To connect a front-end application to the API, please see either the Angular or 
 [Springboot Webflux](https://spring.io/guides/gs/reactive-rest-service/) is a reactive web framework.  For more information on reactive design and its basic principles, we suggest looking at the [Reactive Manifesto](https://www.reactivemanifesto.org/).
 
 For a more detailed guide to understanding how to handle reactive and functional types like `Mono` and `Flux`, please refer to our [Java React Tutorial](https://github.com/excellalabs/reactive-in-java)
+
+##### 9. Deployment to the ECS Cluster
+
+To deploy to the ECS cluster, you need to
+build the production Docker image, push it to the ECR,
+use ecs-cli to create and bring up the service, and open ports in the load balancer.
+
+1. Installing and Configuring the aws and ecs-cli Command-Line Tools
+
+    Follow the instructions from the tcp-ecs repo's README, in the
+    section titled "Installing and Configuring the aws and ecs-cli Command-Line Tools".
+    https://github.com/excellaco/tcp-ecs/
+
+1. Build the production Docker image:
+
+    From the root directory:
+    `docker build -t {{.ProjectName}}-api:latest .`
+    
+    Note: you may need to run this as root: `sudo docker build -t {{.ProjectName}}-api:latest .`
+    This step will take about 2 minutes.  It uses the `Dockerfile`.
+    
+    Do `docker image ls` to make sure the image was built: `{{.ProjectName}}-api`
+
+1. Push the image to the Elastic Container Repository (ECR):
+
+    `ecs-cli push --aws-profile default {{.ProjectName}}-api:latest`
+
+    or, if necessary,
+
+    `sudo ecs-cli push --aws-profile default {{.ProjectName}}-api:latest`
+
+1. Use ecs-cli to create a new task and bring up the service:
+
+    Go to the ecs subdirectory
+
+    Note: all `ecs-cli compose` commands for {{.ProjectName}} *must* be run from this subdirectory.
+
+    `ecs-cli compose --aws-profile default service ps`
+
+    Make sure the service is not running (either it doesn't show up, or it
+    shows up with State = STOPPED). If it is running, do:
+    
+    `ecs-cli compose --aws-profile default service down`
+    
+    and wait for completion.
+
+    The following command will both create the task and bring up the service on the ECS cluster:
+    
+    `ecs-cli compose --aws-profile default service up`
+    
+    This will take about 20 seconds.
+    
+    Double-check that the service is running:
+    
+    `ecs-cli compose --aws-profile default service ps`
+    
+    You should see both `/api` and `/db` containers.
+
+    This will also tell you which host(s) it's running on.
+
+1. Scale up the service (Optional)
+
+    `ecs-cli compose --aws-profile default service scale 2`
+
+1. Enable connections from the internet to the {{.ProjectName}} containers
+
+    [In the future, we will replace this step with Terraform automation.]
+
+    - a) Create a new target group; make its name end with "-to-8080-tg".
+        Make sure to select the correct VPC.
+        Set its type to Instance.  Set its protocol to HTTP. Set its target port to 8080.
+        Do *not* register any instances with it directly: the Auto-Scaling Group (ASG) will do that for us.
+
+    - b) Go to the cluster node ASG (name contains "-cluster-node") and attach the new target group:
+        "Details" tab, "Edit" button.  Click in the "Target Groups" box, type "8080", select the new target group.
+        Click "Save".
+
+    - c) Remove any exsiting Listeners on the ALB that are listening on port 8080.
+        Add a Listener to the ALB: listen on 8080, forward to the new target group.
+
+    - d) Make sure the ALB's Security Group (name ends with "-alb-sg") allows connections on port 8080.
+         Also note the ALB's ARN for the next step.
+
+    - e) Set the cluster node security group (name ends with "-cluster-instance-sg") to
+        accept connections on 8080 from the ALB's Security Group.
+
+1. Check that the API service is running and accessible
+
+    You can get the ALB's FQDN by running: `terraform output cluster_url`
+
+    From a machine that can connect to the ALB (e.g. a machine on Excella's network):
+
+    From the project root directory, 
+    
+    `alb=[fqdn of ALB here, no port]`
+    `./get-token $alb:8000`
+    
+    This will ask the API at `:8080` on the ALB to create a bearer token, then store that token in
+    a file called `token`.  The token file can be used with CURL to access the rest of the API
+
+    Run:
+    `curl -K token $alb:8080/api/employee/2`
+
+    You should get back a JSON response with information about the employeed with ID=2.
+
+1. Troubleshooting
+
+    If either of the above commands fails, try `ssh`ing into one of the cluster nodes, going to
+    the {{.ProjectName}} root directory, and running:
+    `./get-token localhost:8080`
+    `curl -K token localhost:8080/api/employee/2`
+    If this succeeds, the problem is probably with the networking (ALB, Target Groups, Security Groups).
 
