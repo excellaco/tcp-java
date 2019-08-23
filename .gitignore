@@ -9,3 +9,6 @@ build
 .java-version
 *.jks
 .scannerwork/
+reactor.iml
+*.ipr
+*.iws
