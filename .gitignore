@@ -8,4 +8,5 @@ build
 .envrc
 .java-version
 *.jks
+.scannerwork/
 *~

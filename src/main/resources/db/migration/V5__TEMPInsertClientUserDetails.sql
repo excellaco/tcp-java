@@ -6,6 +6,5 @@ INSERT INTO users (id, email, username, password, enabled) VALUES (1, 'john@winc
 INSERT INTO authorities (user_id, username, authority) VALUES (1, 'user', 'ROLE_USER');
 INSERT INTO users (id, email, username, password, enabled) VALUES (2, 'leslie.knope@in.parks.gov', 'admin', '{bcrypt}$2a$10$cyf5NfobcruKQ8XGjUJkEegr9ZWFqaea6vjpXWEaSqTa2xL9wjgQC', TRUE);
 INSERT INTO authorities (user_id, username, authority) VALUES (2, 'admin', 'ROLE_ADMIN');
-INSERT INTO users (id, email, username, password, enabled) VALUES 3, 'test@excella.com', 'user', '{bcrypt}$2a$10$cyf5NfobcruKQ8XGjUJkEegr9ZWFqaea6vjpXWEaSqTa2xL9wjgQC', true);
-INSERT INTO authorities (user_id, username, authority) VALUES (1, 'user', 'ROLE_USER');
-
+INSERT INTO users (id, email, username, password, enabled) VALUES (3, 'test@excella.com', 'user2', '{bcrypt}$2a$10$cyf5NfobcruKQ8XGjUJkEegr9ZWFqaea6vjpXWEaSqTa2xL9wjgQC', true);
+INSERT INTO authorities (user_id, username, authority) VALUES (3, 'user2', 'ROLE_USER');

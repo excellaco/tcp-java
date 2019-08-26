@@ -1,0 +1,30 @@
+#!/bin/bash
+# Create a token file (in the current directory) for use with curl -K
+# Usage: ./get-token [host:port][/partial/url]
+# The default is for host:port to be localhost:8080
+# If you provide a partial url, there must be a slash and no space between
+# host:port and the URL, and it must not end in a slash; e.g.:
+#    ./get-token localhost:8080/myapp
+set -e
+base_url=${1:-localhost:8080}
+base_url=${base_url%/}  # remove single trailing / if present
+# Anemic attempt to protect secret:
+echo '-u app:$2a$04$hqawBldLsWkFJ5CVsvtL7ed1z9yeoknfusz.,EHWzxfLBoViK6OVi' | tr '.,' 'PO' > secret
+echo -n '-H "Authorization: Bearer ' > token
+
+curl -f -K- -d username=user -d password=pass -d grant_type=client_credentials "${base_url}/api/oauth/token" < secret > tokenresponse
+if [ $? != 0 ]; then
+   echo "ERROR: could not get token from ${base_url}/api/oauth/token -- curl request failed"
+   exit 2
+fi
+
+token_value=$(sed 's/.*"access_token":"\([^"]*\).*/\1/g' tokenresponse)
+if [ -z "${token_value}" ] ; then
+   echo "ERROR: no token returned from ${base_url}/api/oauth/token"
+   exit 3
+fi
+echo -n $token_value >> token
+echo '"' >> token
+
+echo "OAuth token file created; you can use it like this:"
+echo "  curl ${base_url}/api/employee/7 -K token"

@@ -56,5 +56,4 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
     }
     return passwordEncoder;
   }
-
 }
