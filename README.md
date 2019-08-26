@@ -223,7 +223,7 @@ use ecs-cli to create and bring up the service, and open ports in the load balan
 
 1. Use ecs-cli to create a new task and bring up the service:
 
-    Go to the ecs subdirectory
+    Go to the tcp-java-ecs subdirectory
 
     Note: all `ecs-cli compose` commands for tcp-java *must* be run from this subdirectory.
 
