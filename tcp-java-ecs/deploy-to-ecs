@@ -22,13 +22,13 @@ ecs-cli --version
 ls -al Docker* generate-keystore
 
 # quote $PWD in case it contains spaces; whole thing will be assigned to project_name
-project_name=$(basename "$PWD")
-password=$(echo -n "fpnggretbevrf" | tr '[a-mn-zA-MN-Z]' '[n-za-mN-ZA-M]')
+#project_name=$(basename "$PWD")
+#password=$(echo -n "fpnggretbevrf" | tr '[a-mn-zA-MN-Z]' '[n-za-mN-ZA-M]')
 # TODO: figure out how secure the keystore password needs to be, and how to get it
 
 echo "Generating the keystore and .env file..."
 cat <<EOF > gk-input
-$project_name
+keystore
 $password
 Nobody
 DevOps
