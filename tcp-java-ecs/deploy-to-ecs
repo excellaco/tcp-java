@@ -14,6 +14,34 @@ set -eux
 # Can just check for Dockerfile, and cd .. if not there
 
 date
+
+echo "Running in $PWD"
+
+docker --version
+ecs-cli --version
+ls -al Docker* generate-keystore
+
+project_name=$(basename $PWD)
+password=$(echo -n "fpnggretbevrf" | tr '[a-mn-zA-MN-Z]' '[n-za-mN-ZA-M]')
+# TODO: figure out how secure the keystore password needs to be, and how to get it
+
+echo "Generating the keystore and .env file..."
+cat <<EOF > gk-input
+$project_name
+$password
+Nobody
+DevOps
+Excella
+Arlington
+VA
+US
+yes
+EOF
+
+./generate-keystore < gk-input && rm gk-input
+
+cp -p .env tcp-java-ecs/
+
 echo "Building the tcp-java-api Docker image..."
 # TODO: may need sudo, or to run this script as sudo?
 docker build -t tcp-java-api:latest .
