@@ -1,0 +1,81 @@
+#!/bin/bash
+
+# Deploy the containers for the tcp-java service into the ECS cluster
+# This script does NOT wait until the deployed containers (api and db) are actually RUNNING
+# Assumes credentials are already set up in the default aws profile;
+# assumes default ecs-cli cluster is the one you want to deploy to.
+
+# Fail on any error; unset variables are errors; show commands before executing:
+set -eux
+
+# TODO: see if logging anything from this script would be helpful
+
+# TODO: make sure we're in the correct (root) directory
+# Can just check for Dockerfile, and cd .. if not there
+
+date
+echo "Building the tcp-java-api Docker image..."
+# TODO: may need sudo, or to run this script as sudo?
+docker build -t tcp-java-api:latest .
+
+docker image ls | grep tcp-java-api
+
+echo "Pushing tcp-java-api image to ECR..."
+ecs-cli push --aws-profile default tcp-java-api:latest
+
+cd tcp-java-ecs
+
+echo "Checking current state of service..."
+(ecs-cli compose --aws-profile default service ps ||:) | tee service-status
+
+# Remember: failed grep returns an error (1)
+
+# States not in { RUNNING, STOPPED } include { PENDING }
+state=OTHER
+
+# If ANY are RUNNING, state is ACTIVE
+if ( grep -q RUNNING service-status ) ; then
+    state=ACTIVE
+elif  ( grep -q STOPPED service-status ) ; then
+    state=INACTIVE
+elif  ( grep -q ServiceNotFoundException service-status ) ; then
+    state=NONEXISTENT
+fi
+
+echo "state is $state"
+
+if [ "$state" == "OTHER" ] ; then
+    echo "ERROR: unknown service state; see above.  Quitting...."
+    exit 2
+fi
+
+# TODO: what about the case where one is RUNNING, the other STOPPED?
+# TODO: what about where LOTS are STOPPED, 2 are RUNNING?
+#   Right now, we count that as ACTIVE
+
+# Possibilities:
+# Has never been deployed: get error status 1, "ServiceNotFoundException" in the output
+#  --> go ahead and deploy with "service up"
+# Has been deployed, but is stopped: exit status 0, "STOPPED" in the output (2 lines)
+#  --> go ahead an deploy with "service up"
+# Has been deployed, is RUNNING: exit status 0, "RUNNING" in the output (2 lines)
+#  --> go ahead an deploy with "service up", believe it or not
+
+# When you bring it down successfully: exit status 0
+# When you bring it down but it's already down: exit status 0
+# When you bring it down but it doesn't exist yet: exit status 1
+#     FATA[0000] Got an error describing service 'someservice' : 'MISSING'   <-- console
+#     time="2019-08-26T13:58:04-04:00" level=fatal msg="Got an error describing service 'someservice' : 'MISSING'"  <-- if you pipe it
+
+# When you bring it up successfully: exit status 0
+
+echo "Bringing service up..."
+ecs-cli compose --aws-profile default service up
+
+echo "Checking state of service..."
+ecs-cli compose --aws-profile default service ps
+
+# TODO: wait around until at least two things are RUNNING
+
+date
+cd ..
