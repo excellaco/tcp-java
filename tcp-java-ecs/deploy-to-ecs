@@ -46,8 +46,10 @@ cp -p .env tcp-java-ecs/
 
 cluster_name=$(aws ssm get-parameter --name "/dev/cluster-name" --query "Parameter.Value" --out text)
 
-echo "Configuring the default ECS cluster for ecs-cli to $cluster_name..."
-ecs-cli configure --cluster $cluster_name --region us-east-1 --default-launch-type EC2
+aws_region=$(curl -s http://169.254.169.254/latest/meta-data/placement/availability-zone | sed "s/[a-z]$//")
+
+echo "Configuring the default ECS cluster for ecs-cli to $cluster_name in region $aws_region..."
+ecs-cli configure --cluster $cluster_name --region $aws_region --default-launch-type EC2
 
 echo "Building the tcp-java-api Docker image..."
 # TODO: may need sudo, or to run this script as sudo?
