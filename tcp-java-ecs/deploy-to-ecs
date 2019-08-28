@@ -2,8 +2,11 @@
 
 # Deploy the containers for the tcp-java service into the ECS cluster
 # This script does NOT wait until the deployed containers (api and db) are actually RUNNING
-# Assumes credentials are already set up in the default aws profile;
-# assumes name of cluster to deploy to is in SSM key "/dev/cluster-name"
+# Pushes the latest local tcp-java-api image to ECR.
+#
+# Assumes it is run in the ECS service subdirectory (where the ECS docker-compose.yml is);
+# assumes credentials are already set up in the default aws profile;
+# assumes name of cluster to deploy to is in SSM key "/dev/cluster-name";
 # sets the default ecs-cli cluster to that cluster.
 
 # Fail on any error; unset variables are errors; show commands before executing:
@@ -11,60 +14,28 @@ set -eux
 
 # TODO: see if logging anything from this script would be helpful
 
-# TODO: make sure we're in the correct (root) directory
+# TODO: make sure we're in the correct directory (with ECS docker-compose.yml in it)
 # Can just check for Dockerfile, and cd .. if not there
 
 date
 
 echo "Running in $PWD"
 
-docker --version
+aws --version
 ecs-cli --version
-ls -al Docker* generate-keystore
 
-# quote $PWD in case it contains spaces; whole thing will be assigned to project_name
-#project_name=$(basename "$PWD")
-password=$(echo -n "fpnggretbevrf" | tr '[a-mn-zA-MN-Z]' '[n-za-mN-ZA-M]')
-# TODO: figure out how secure the keystore password needs to be, and how to get it
+IMAGE=$(grep "image: .*amazonaws.com/" docker-compose.yml | sed "s/^[^\/]*\///")
+echo "Image from docker-compose.yml is $IMAGE"
 
-echo "Generating the keystore and .env file..."
-cat <<EOF > gk-input
-keystore
-$password
-Nobody
-DevOps
-Excella
-Arlington
-VA
-US
-yes
-EOF
-
-./generate-keystore < gk-input && rm gk-input
-
-cp -p .env tcp-java-ecs/
+echo "Pushing image $IMAGE to ECR..."
+ecs-cli push --aws-profile default $IMAGE:latest
 
 aws_region=$(curl -s http://169.254.169.254/latest/meta-data/placement/availability-zone | sed "s/[a-z]$//")
 
 cluster_name=$(aws ssm get-parameter --region $aws_region --name "/dev/cluster-name" --query "Parameter.Value" --out text)
 
-# Try this to authenticate:
-aws ecr get-login --region $aws_region --no-include-email
-$(aws ecr get-login --region $aws_region --no-include-email)
-
 echo "Configuring the default ECS cluster for ecs-cli to $cluster_name in region $aws_region..."
 ecs-cli configure --cluster $cluster_name --region $aws_region --default-launch-type EC2
-
-echo "Building the tcp-java-api Docker image..."
-# TODO: may need sudo, or to run this script as sudo?
-docker build -t tcp-java-api:latest .
-
-docker image ls | grep tcp-java-api
-
-echo "Pushing tcp-java-api image to ECR..."
-ecs-cli push --aws-profile default tcp-java-api:latest
-
-cd tcp-java-ecs
 
 echo "Checking current state of service..."
 (ecs-cli compose --aws-profile default service ps ||:) | tee service-status
@@ -98,9 +69,9 @@ fi
 # Has never been deployed: get error status 1, "ServiceNotFoundException" in the output
 #  --> go ahead and deploy with "service up"
 # Has been deployed, but is stopped: exit status 0, "STOPPED" in the output (2 lines)
-#  --> go ahead an deploy with "service up"
+#  --> go ahead and deploy with "service up"
 # Has been deployed, is RUNNING: exit status 0, "RUNNING" in the output (2 lines)
-#  --> go ahead an deploy with "service up", believe it or not
+#  --> need to take it down, wait for draining, then bring it back up
 
 # When you bring it down successfully: exit status 0
 # When you bring it down but it's already down: exit status 0
@@ -110,8 +81,25 @@ fi
 
 # When you bring it up successfully: exit status 0
 
+if [ "$state" == "ACTIVE" ] ; then
+   echo "Bringing service down (because current state is $state)..."
+   ecs-cli compose --aws-profile default service down
+   sleep 20  # give it some time to drain
+fi
+
+# If the service was running before, it will take some time (usually < 30 seconds) to drain
 echo "Bringing service up..."
-ecs-cli compose --aws-profile default service up
+counter_limit=10
+counter=$counter_limit
+until ( ecs-cli compose --aws-profile default service up ) ; do
+    counter=$((counter - 1))
+    if (( counter <= 0 )); then
+        echo "ERROR: Could not bring service up after $counter_limit attempts.  Quitting..."
+        date
+        exit 3
+    fi
+    sleep 5
+done;
 
 echo "Checking state of service..."
 ecs-cli compose --aws-profile default service ps
@@ -119,4 +107,3 @@ ecs-cli compose --aws-profile default service ps
 # TODO: wait around until at least two things are RUNNING
 
 date
-cd ..
