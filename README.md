@@ -1,6 +1,6 @@
-[![Build Status](https://sandbox-tcp-jenkins.excellalabs.com/buildStatus/icon?job=TCP%2FJava%2Ftcp-java%2Fmaster)](https://sandbox-tcp-jenkins.excellalabs.com/job/TCP/job/Java/job/tcp-java/job/master/)
-[![Coverage](http://scgrt-rdso-jd-ecs-alb-867083871.us-west-1.elb.amazonaws.com:9000/api/project_badges/measure?project=tcp-java&metric=coverage)](http://scgrt-rdso-jd-ecs-alb-867083871.us-west-1.elb.amazonaws.com:9000/dashboard?id=tcp-java)
-[![Vulnerabilities](http://scgrt-rdso-jd-ecs-alb-867083871.us-west-1.elb.amazonaws.com:9000/api/project_badges/measure?project=tcp-java&metric=vulnerabilities)](http://scgrt-rdso-jd-ecs-alb-867083871.us-west-1.elb.amazonaws.com:9000/dashboard?id=tcp-java)
+[![Build Status](https://prd-tcp-jenkins.excellalabs.com/buildStatus/icon?job=TCP%2FJava%2Ftcp-java%2Fmaster)](https://prd-tcp-jenkins.excellalabs.com/job/TCP/job/Java/job/tcp-java/job/master/)
+[![Coverage](http://sonarqube.excellalabs.com:9000/api/project_badges/measure?project=tcp-java&metric=coverage)](http://sonarqube.excellalabs.com:9000/dashboard?id=tcp-java)
+[![Vulnerabilities](http://sonarqube.excellalabs.com:9000/api/project_badges/measure?project=tcp-java&metric=vulnerabilities)](http://sonarqube.excellalabs.com:9000/dashboard?id=tcp-java)
 
 
 # tcp-java repository
@@ -120,7 +120,7 @@ There are two ways you can use OAuth to interact with the app's API from the com
 
 ##### A) Automated OAuth token request
 
-From the project root directory, 
+From the project root directory,
 
 `./get-token`
 
@@ -207,10 +207,10 @@ use ecs-cli to create and bring up the service, and open ports in the load balan
 
     From the root directory:
     `docker build -t tcp-java-api:latest .`
-    
+
     Note: you may need to run this as root: `sudo docker build -t tcp-java-api:latest .`
     This step will take about 2 minutes.  It uses the `Dockerfile`.
-    
+
     Do `docker image ls` to make sure the image was built: `tcp-java-api`
 
 1. Push the image to the Elastic Container Repository (ECR):
@@ -231,21 +231,21 @@ use ecs-cli to create and bring up the service, and open ports in the load balan
 
     Make sure the service is not running (either it doesn't show up, or it
     shows up with State = STOPPED). If it is running, do:
-    
+
     `ecs-cli compose --aws-profile default service down`
-    
+
     and wait for completion.
 
     The following command will both create the task and bring up the service on the ECS cluster:
-    
+
     `ecs-cli compose --aws-profile default service up`
-    
+
     This will take about 20 seconds.
-    
+
     Double-check that the service is running:
-    
+
     `ecs-cli compose --aws-profile default service ps`
-    
+
     You should see both `/api` and `/db` containers.
 
     This will also tell you which host(s) it's running on.
@@ -282,11 +282,11 @@ use ecs-cli to create and bring up the service, and open ports in the load balan
 
     From a machine that can connect to the ALB (e.g. a machine on Excella's network):
 
-    From the project root directory, 
-    
+    From the project root directory,
+
     `alb=[fqdn of ALB here, no port]`
     `./get-token $alb:8000`
-    
+
     This will ask the API at `:8080` on the ALB to create a bearer token, then store that token in
     a file called `token`.  The token file can be used with CURL to access the rest of the API
 
@@ -302,4 +302,3 @@ use ecs-cli to create and bring up the service, and open ports in the load balan
     `./get-token localhost:8080`
     `curl -K token localhost:8080/api/employee/2`
     If this succeeds, the problem is probably with the networking (ALB, Target Groups, Security Groups).
-
