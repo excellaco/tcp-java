@@ -11,7 +11,7 @@
 
 # Fail on any error; unset variables are errors; show commands before executing:
 set -eux
-
+ENV="$1"
 # TODO: see if logging anything from this script would be helpful
 
 # TODO: make sure we're in the correct directory (with ECS docker-compose.yml in it)
@@ -20,23 +20,32 @@ set -eux
 date
 
 echo "Running in $PWD"
+echo "Target Environment = $ENV"
 
+# Check versions of required software #
+######################################
 aws --version
 ecs-cli --version
 
+# Get image produced via previous 'package_for_ecs' script #
+############################################################
 IMAGE=$(grep "image: .*amazonaws.com/" docker-compose.yml | sed "s/^[^\/]*\///")
 echo "Image from docker-compose.yml is $IMAGE"
 
-echo "Pushing image $IMAGE to ECR..."
-ecs-cli push --aws-profile default $IMAGE:latest
-
+# Configure ecs-cli #
+#####################
 aws_region=$(curl -s http://169.254.169.254/latest/meta-data/placement/availability-zone | sed "s/[a-z]$//")
-
-cluster_name=$(aws ssm get-parameter --region $aws_region --name "/dev/cluster-name" --query "Parameter.Value" --out text)
-
+cluster_name=$(aws ssm get-parameter --region $aws_region --name "/$ENV/cluster-name" --query "Parameter.Value" --out text)
 echo "Configuring the default ECS cluster for ecs-cli to $cluster_name in region $aws_region..."
 ecs-cli configure --cluster $cluster_name --region $aws_region --default-launch-type EC2
 
+# Upload image to ECR #
+#######################
+echo "Pushing image $IMAGE to ECR..."
+ecs-cli push --aws-profile default $IMAGE:latest
+
+# Check state of service, and wait until new version becomes active #
+#####################################################################
 echo "Checking current state of service..."
 (ecs-cli compose --aws-profile default service ps ||:) | tee service-status
 
@@ -60,26 +69,6 @@ if [ "$state" == "OTHER" ] ; then
     echo "ERROR: unknown service state; see above.  Quitting...."
     exit 2
 fi
-
-# TODO: what about the case where one is RUNNING, the other STOPPED?
-# TODO: what about where LOTS are STOPPED, 2 are RUNNING?
-#   Right now, we count that as ACTIVE
-
-# Possibilities:
-# Has never been deployed: get error status 1, "ServiceNotFoundException" in the output
-#  --> go ahead and deploy with "service up"
-# Has been deployed, but is stopped: exit status 0, "STOPPED" in the output (2 lines)
-#  --> go ahead and deploy with "service up"
-# Has been deployed, is RUNNING: exit status 0, "RUNNING" in the output (2 lines)
-#  --> need to take it down, wait for draining, then bring it back up
-
-# When you bring it down successfully: exit status 0
-# When you bring it down but it's already down: exit status 0
-# When you bring it down but it doesn't exist yet: exit status 1
-#     FATA[0000] Got an error describing service 'someservice' : 'MISSING'   <-- console
-#     time="2019-08-26T13:58:04-04:00" level=fatal msg="Got an error describing service 'someservice' : 'MISSING'"  <-- if you pipe it
-
-# When you bring it up successfully: exit status 0
 
 if [ "$state" == "ACTIVE" ] ; then
    echo "Bringing service down (because current state is $state)..."
@@ -107,3 +96,6 @@ ecs-cli compose --aws-profile default service ps
 # TODO: wait around until at least two things are RUNNING
 
 date
+
+# DONE #
+########

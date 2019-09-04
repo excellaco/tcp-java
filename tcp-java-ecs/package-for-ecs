@@ -6,7 +6,7 @@
 
 # Fail on any error; unset variables are errors; show commands before executing:
 set -eux
-
+ENV="$1"
 # TODO: see if logging anything from this script would be helpful
 
 # TODO: make sure we're in the correct (root) directory
@@ -15,6 +15,7 @@ set -eux
 date
 
 echo "Running in $PWD"
+echo "Target Environment = $ENV"
 
 docker --version
 ls -al Docker* generate-keystore
@@ -45,4 +46,3 @@ docker build -t tcp-java-api:latest .
 
 echo "Checking for the Docker image..."
 docker image ls | grep tcp-java-api
-
