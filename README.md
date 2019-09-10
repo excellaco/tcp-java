@@ -7,49 +7,42 @@
 
 A CRUD example using Spring WebFlux and Java 11
 
+## Quickstart
 
-##### 1. Install:
-  - [docker](https://docs.docker.com/engine/installation/)
-  - [docker-compose](https://docs.docker.com/compose/install/)
-  - keytool: this is part of the JDK; if you don't already have it: `sudo apt-get install openjdk-11-jdk`
-      -For mac run: `brew cask install java`
+### Prerequisites
+
+For local development, you will need:
+
+1. <u>Docker Engine</u> (docker)
+    * See next step
+1. <u>Docker Compose</u> (docker-compose)
+    * Linux: Most official repositories have a docker-compose package - use your package manager to get it. This package will typically install docker as a dependency.
+    * Mac, Windows: Install [Docker Desktop](https://www.docker.com/products/docker-desktop). It includes both the engine and compose.
+    * Problems (or don't want Docker Desktop)? Go [here](https://docs.docker.com/compose/install/).
+    * **Windows Users**: make sure you have Win 10 *Professional* or you may not be able to install the latest Docker tools, due to lack of Hyper-V support.
+1. <u>JDK 11+</u>, both for the keytool and for IDE tooling. Installing latest is fine, unless the keytool gets removed in a future version. If you don't already have it:
+    * Linux: Most official repositories have a package for the JDK - use your package manager to get the latest. Typically, OpenJDK is recommended.
+    ***Be sure to add the installed binary folder to your PATH and set JAVA_HOME, replacing the reference to any older JDKs***, if the package didn't do it for you.
+    * Mac (Homebrew): `brew cask install java`
+    * Windows:  It's simplest just to install the [latest JDK](https://www.oracle.com/technetwork/java/javase/downloads/index.html) from Oracle, rather than try something fancy. You may need to edit the system environment variables to add the binary folder to PATH and set JAVA_HOME, unless the installer does this for you.
+1. (Windows) <u>Git Bash</u> (from [Git for Windows](https://gitforwindows.org/) or GitHub Desktop), or some other bash emulator, to run bash scripts. **Run any script commands in the rest of this README from the emulator prompt, rather than CMD**.
+	* Terminal or application complaining about \r characters? [You need Unix line endings](https://help.github.com/en/articles/configuring-git-to-handle-line-endings) because shells don't like carriage return, so run `git config --global core.autocrlf input`. You may need to re-checkout after changing this setting.
 
 Docker (Engine) version 18.09.8 is known to work;
-docker-compose version 1.24.1 is known to work; docker-compose version 1.17.1 is known to NOT work.
+Docker Compose version 1.24.1 is known to work; docker-compose version 1.17.1 is known **not** to work.
 Older versions may not support the docker-compose 3.7 file format, which this project uses.
+
 You can check the installed versions with:
-```
+```bash
 docker --version
 docker-compose --version
 ```
 
 
-##### 2. Using the Command-Line Interface (CLI)
-  - Download and setup the [TCP CLI](https://github.com/excellaco/xg#installation):
-    this consists of a single binary which can be put in your PATH.
-  - Copy the `xg.yaml` file from this repository to where you will run the CLI (you do not need to clone the entire repository)
-  - Fill out the appropriate fields in `xg.yaml` with the desired values: (can quotes be used?)
-    - projectName (directory)
-    - ProjectName (for Gradle)
-    - GroupName (for Gradle; typically "com.excella")
-  - run `xg make`
-    - Note: Your `xg` must be 0.2.1 (7/23/19) or later; `xg version` will show the installed version.
-    - Note: if your private key for the tcp-java GitHub repo is not in `~/.ssh/id_rsa`, specify it with the '-i' or '--identity' flag:
-      `xg make -i ~/.ssh/my_github_key` .  Failure to provide the correct private key will result in the error message `Error: Unable to clone repository remote`.
-    - This will list a bunch of files and directories, prefixed with "F" for a file, "T" for a template, and "D" for a directory.
-    - The result is in a subdirectory whose name is the same as the projectName you specified in `xg.yaml`.  Here we assume it's called my-project.
-    - The result is *not* a Git workspace: there's no `.git` subdirectory.
-  - Work around minor current `xg` limitations:
-    - `cp -p xg.yaml my-project` # xg puts the version of xg.yaml as found in the repo under my-project
-
-##### 3. Setup the application
+### Set up the application
 This project uses OAuth2 and JWT for authentication / authorization.
 
-[TODO: document the new generate-keystore script]
-
-In order for the app to work correctly, you must create a Java KeyStore (.jks) file in the classpath (i.e., in src/main/resources).  There is an automated way and a manual way to do this.
-
-##### A) Automated JKS setup
+In order for the app to work correctly, you must create a Java KeyStore (.jks) file in the classpath (i.e., in src/main/resources).  We have created a script for this purpose.
 
 From the project root, run the following command:
 
@@ -58,61 +51,25 @@ From the project root, run the following command:
 It will ask you for a keystore filename (e.g. mytest.jks) and a keystore password.
 It will create an .env file, then run `keytool`, which will ask you a bunch of questions.
 
-##### B) Manual JKS setup
 
-Create the JKS using the following command, from the project root:
-```
-keytool -genkeypair -alias server -keyalg RSA -keypass mypass -keystore src/main/resources/mytest.jks -storepass mypass
-```
+### Run the application
 
-Note: the two passwords (keypass and storepass) must be the same.
+1. Compile the app: `./start clean build`
+    * Note: if a script gives permission denied, you may need to run `chmod a+x script_name`
+    * Note: if the build fails on the format check, run this and then try again: `./start goJF`. If this is a fresh checkout, go yell at whoever merged the format violations to master.
+    * Note: if you get a lot of FileNotFoundException test failures, double check that you ran the `generate-keystore` script. There should be a .env file in the app's root directory and a *.jks file in `src/main/resources`
+1. Run the application: `./start bootrun`
+1. Navigate to: > http://localhost:8080/api/swagger-ui.html
+1. Click the lock button to pop up a login prompt. The default credentials are `user` / `pass` .
 
-`keytool` will ask you a bunch of questions.
-
-Next, add an .env file in the project root and populate it with the same info you specified in the `keytool` command above.
-These values will be automatically used in the application.yml file.
-
-Here's what your .env file should look like.
-
-```$xslt
-JWT_KEY_STORE=classpath:mytest.jks
-JWT_KEY_STORE_PASS=mypass
-JWT_KEYPAIR_ALIAS=server
-JWT_KEYPAIR_PASS=mypass
-```
-
-Once the app is running, you'll be able to get a token from it and call the rest of its API. (See below.)
-
-##### C) Flyway setup
-
-Also, please ensure Flyway migrations are running. They include the DB setup for OAuth2 and Users. See the following for more information
-
- - https://docs.spring.io/spring-security/site/docs/5.0.x/reference/html5/#appendix-schema
- - https://github.com/spring-projects/spring-security-oauth/blob/master/spring-security-oauth2/src/test/resources/schema.sql
-
-
-##### 4. Run the application
-
-- Compile the app: `./start clean build`
-  - Note: you forgot to do `chmod a+x start test gradlew` above, didn't you? Do it now.
-  - Note: if you don't want the fancy font coloring and status bars, you can do `./start --console plain clean build`
-  - Note: if the build fails on the format check, run this and then try again: `./start goJF`
-  - Note: if you get a lot of FileNotFoundException test failures, check that your keystore (`.jks`) file is in the CLASSPATH and is readable
-
-- Run the application: `./start bootrun`
-
-- Navigate to:
-    > http://localhost:8080/api/swagger-ui.html
+### Common Development Tasks
 
 When the app is not running:
 
-- Run the tests: `./start testNG`
-
-- Run the linter: `./start verGJF`
-
-- Auto-fix linter warnings: `./start goJF`
-
-- Run linter + tests + test report: `./test` (coverage report is generated under `build/jacocoHtml/index.html`)
+* Run the tests: `./start testNG`
+* Run the linter: `./start verGJF`
+* Auto-fix linter warnings (do this on the last commit before pushing!): `./start goJF`
+* Run linter + tests + test report: `./test` (coverage report is generated under `build/jacocoHtml/index.html`)
 
 ##### 5  Use OAuth to interact with the API
 
@@ -190,6 +147,24 @@ To connect a front-end application to the API, please see either the Angular or 
 [Springboot Webflux](https://spring.io/guides/gs/reactive-rest-service/) is a reactive web framework.  For more information on reactive design and its basic principles, we suggest looking at the [Reactive Manifesto](https://www.reactivemanifesto.org/).
 
 For a more detailed guide to understanding how to handle reactive and functional types like `Mono` and `Flux`, please refer to our [Java React Tutorial](https://github.com/excellalabs/reactive-in-java)
+
+##### Using the Command-Line Interface (CLI)
+  - Download and setup the [TCP CLI](https://github.com/excellaco/xg#installation):
+    this consists of a single binary which can be put in your PATH.
+  - Copy the `xg.yaml` file from this repository to where you will run the CLI (you do not need to clone the entire repository)
+  - Fill out the appropriate fields in `xg.yaml` with the desired values: (can quotes be used?)
+    - projectName (directory)
+    - ProjectName (for Gradle)
+    - GroupName (for Gradle; typically "com.excella")
+  - run `xg make`
+    - Note: Your `xg` must be 0.2.1 (7/23/19) or later; `xg version` will show the installed version.
+    - Note: if your private key for the tcp-java GitHub repo is not in `~/.ssh/id_rsa`, specify it with the '-i' or '--identity' flag:
+      `xg make -i ~/.ssh/my_github_key` .  Failure to provide the correct private key will result in the error message `Error: Unable to clone repository remote`.
+    - This will list a bunch of files and directories, prefixed with "F" for a file, "T" for a template, and "D" for a directory.
+    - The result is in a subdirectory whose name is the same as the projectName you specified in `xg.yaml`.  Here we assume it's called my-project.
+    - The result is *not* a Git workspace: there's no `.git` subdirectory.
+  - Work around minor current `xg` limitations:
+    - `cp -p xg.yaml my-project` # xg puts the version of xg.yaml as found in the repo under my-project
 
 ##### 9. Deployment to the ECS Cluster
 
