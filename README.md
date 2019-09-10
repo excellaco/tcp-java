@@ -59,7 +59,8 @@ It will create an .env file, then run `keytool`, which will ask you a bunch of q
     * Note: if the build fails on the format check, run this and then try again: `./start goJF`. If this is a fresh checkout, go yell at whoever merged the format violations to master.
     * Note: if you get a lot of FileNotFoundException test failures, double check that you ran the `generate-keystore` script. There should be a .env file in the app's root directory and a *.jks file in `src/main/resources`
 1. Run the application: `./start bootrun`
-1. Navigate to: > http://localhost:8080/api/swagger-ui.html
+1. Navigate to: 
+	> http://localhost:8080/api/swagger-ui.html
 1. Click the lock button to pop up a login prompt. The default credentials are `user` / `pass` .
 
 ### Common Development Tasks
