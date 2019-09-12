@@ -23,7 +23,7 @@ For local development, you will need:
         
 
 Docker (Engine) version 18.09.8 is known to work;
-Docker Compose version 1.24.1 is known to work; docker-compose version 1.17.1 is known **not** to work.
+docker-compose version 1.24.1 is known to work; docker-compose version 1.17.1 is known **not** to work.
 Older versions may not support the docker-compose 3.7 file format, which this project uses.
 
 You can check the installed versions with:
