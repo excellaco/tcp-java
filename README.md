@@ -7,29 +7,23 @@
 
 A CRUD example using Spring WebFlux and Java 11
 
-## Quickstart
-
-### Prerequisites
+## Prerequisites
 
 For local development, you will need:
 
-1. (Windows Only) [You need Unix line endings](https://help.github.com/en/articles/configuring-git-to-handle-line-endings) because shells don't like carriage return, so run `git config --global core.autocrlf input`. Ideally you did this before cloning; if not, re-checkout after changing this setting. If you don't do this, git auto-converts LF to CRLF (\r) and the shell scripts will break if run locally.
-1. <u>Docker Engine</u> (docker)
-    * See next step
+1. [Git](www.git-scm.com)
+    * (Windows Only) [You need to preserve Unix line endings on checkout](https://help.github.com/en/articles/configuring-git-to-handle-line-endings) because shells don't like carriage return. Run `git config --global core.autocrlf input`. Ideally you did this before cloning; if not, re-checkout after changing this setting. If you don't do this, git auto-converts LF to CRLF (\r) and the shell scripts will break if run locally.
 1. <u>Docker Compose</u> (docker-compose)
     * Linux: Most official repositories have a docker-compose package - use your package manager to get it. This package will typically install docker as a dependency.
-    * Mac, Windows: Install [Docker Desktop](https://www.docker.com/products/docker-desktop). It includes both the engine and compose.
-    * Problems (or don't want Docker Desktop)? Go [here](https://docs.docker.com/compose/install/).
+    * Mac, Windows: Go [here](https://docs.docker.com/compose/install/).
     * **Windows Users**: make sure you have Win 10 *Professional* or you may not be able to install the latest Docker tools, due to lack of Hyper-V support.
-1. <u>JDK 11+</u>, both for the keytool (if not running in a container) and for IDE tooling. Installing latest is fine, unless the keytool gets removed in a future version. If you don't already have it:
+1. <u>JDK 11+</u>, both for the keytool (if not running in a container) and for IDE tooling. Installing latest is fine, unless the keytool gets removed in a future version. To check for a suitable JDK, use `java -version`. If you don't have one:
     * Linux: Most official repositories have a package for the JDK - use your package manager to get the latest. Typically, OpenJDK is recommended.
     ***Be sure to add the installed binary folder to your PATH and set JAVA_HOME, replacing the reference to any older JDKs***, if the package didn't do it for you.
     * Mac (Homebrew): `brew cask install java`
     * Windows:  It's simplest just to install the [latest JDK](https://www.oracle.com/technetwork/java/javase/downloads/index.html) from Oracle, rather than try something fancy. You may need to edit the system environment variables to add the binary folder to PATH and set JAVA_HOME, unless the installer does this for you.
-1. (Windows Only) The vast majority of local development setup scripts in this repository are written in bash. To work around this, use docker-compose to get a bash session: `docker-compose run api bash`. The "api" configuration includes the JDK and mounts the project root under "app/" - scripts should be visible, and their output should persist. **Run any script commands in the rest of the Quickstart from this bash prompt, rather than directly in CMD or Powershell**. 
         
-	* You can try to use Git Bash (from [Git for Windows](https://gitforwindows.org/) or GitHub Desktop), or some other bash emulator, but certain interactive scripts may hang (keytool?).
-	* Terminal or application complaining about \r characters? See Prerequisite #1.
+	* Terminal or application complaining about \r characters? See the Windows warning under the Git prerequisite.
 
 Docker (Engine) version 18.09.8 is known to work;
 Docker Compose version 1.24.1 is known to work; docker-compose version 1.17.1 is known **not** to work.
@@ -40,6 +34,22 @@ You can check the installed versions with:
 docker --version
 docker-compose --version
 ```
+
+## Quickstart
+1. Install the [prerequisites](#prerequisites) above.
+1. Clone this repository: `git clone git@github.com:excellaco/tcp-java.git`
+1. Open a terminal in the root of the cloned project. <u>Windows users should open a Git Bash</u>, which comes with Git for Windows and GitHub Desktop.
+1. (Windows) Run `docker-compose run api bash`. Use this bash prompt for the next step.
+1. Run `./generate-keystore`. It doesn't really matter what information you enter here.
+1. (Windows) Run `exit` once to drop out of the docker container.
+1. Run `./start bootrun` and wait for the backend to start up
+1. Go to http://localhost:8080/api/swagger-ui.html to see interactive API documentation.
+1. Before you perform requests from Swagger, click the small lock icon and enter `user` / `pass`. 
+
+## Detailed Start and Development Setup
+
+Windows users - as in the Quickstart, you should use Git Bash.
+
 ### Getting the code
 
 There are two primary ways to pull the code for a standalone backend - clone/download of this repository, and the XG tool.
@@ -72,13 +82,14 @@ This project uses OAuth2 and JWT for authentication / authorization.
 
 In order for the app to work correctly, you must create a Java KeyStore (.jks) file in the classpath (i.e., in src/main/resources).  We have created a script for this purpose.
 
-From the project root, run the following command:
+From the project root, run the following command(s):
 
-`./generate-keystore`
+1. (Windows Only) Use `docker-compose run api bash` to get an interactive session on a docker container with the project mounted, otherwise the script may hang trying to get input from a fake TTY.
+2. `./generate-keystore`
+3. (Windows Only) `exit` once to drop out of the docker session.
 
-It will ask you for a keystore filename (e.g. mytest.jks) and a keystore password.
-The script will create an .env file for you, then run `keytool` behind the scenes. This will prompt for several user inputs. You can enter dummy data, as this information will only be used in your local environment.
-
+The generate-keystore script is interactive. It will ask you for a keystore filename (e.g. mytest.jks) and a keystore password.
+It will then create an .env file for you, then run `keytool` behind the scenes. This will prompt for several user inputs. You can enter dummy data, as this information will only be used in your local environment.
 
 ### Run the application
 
