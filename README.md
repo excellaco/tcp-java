@@ -77,7 +77,7 @@ From the project root, run the following command:
 `./generate-keystore`
 
 It will ask you for a keystore filename (e.g. mytest.jks) and a keystore password.
-It will create an .env file, then run `keytool`, which will ask you a bunch of questions.
+The script will create an .env file for you, then run `keytool` behind the scenes. This will prompt for several user inputs. You can enter dummy data, as this information will only be used in your local environment.
 
 
 ### Run the application
