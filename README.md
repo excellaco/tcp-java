@@ -13,6 +13,7 @@ A CRUD example using Spring WebFlux and Java 11
 
 For local development, you will need:
 
+1. (Windows Only) [You need Unix line endings](https://help.github.com/en/articles/configuring-git-to-handle-line-endings) because shells don't like carriage return, so run `git config --global core.autocrlf input`. Ideally you did this before cloning; if not, re-checkout after changing this setting. If you don't do this, git auto-converts LF to CRLF (\r) and the shell scripts will break if run locally.
 1. <u>Docker Engine</u> (docker)
     * See next step
 1. <u>Docker Compose</u> (docker-compose)
@@ -20,13 +21,14 @@ For local development, you will need:
     * Mac, Windows: Install [Docker Desktop](https://www.docker.com/products/docker-desktop). It includes both the engine and compose.
     * Problems (or don't want Docker Desktop)? Go [here](https://docs.docker.com/compose/install/).
     * **Windows Users**: make sure you have Win 10 *Professional* or you may not be able to install the latest Docker tools, due to lack of Hyper-V support.
-1. <u>JDK 11+</u>, both for the keytool and for IDE tooling. Installing latest is fine, unless the keytool gets removed in a future version. If you don't already have it:
+1. <u>JDK 11+</u>, both for the keytool (if not running in a container) and for IDE tooling. Installing latest is fine, unless the keytool gets removed in a future version. If you don't already have it:
     * Linux: Most official repositories have a package for the JDK - use your package manager to get the latest. Typically, OpenJDK is recommended.
     ***Be sure to add the installed binary folder to your PATH and set JAVA_HOME, replacing the reference to any older JDKs***, if the package didn't do it for you.
     * Mac (Homebrew): `brew cask install java`
     * Windows:  It's simplest just to install the [latest JDK](https://www.oracle.com/technetwork/java/javase/downloads/index.html) from Oracle, rather than try something fancy. You may need to edit the system environment variables to add the binary folder to PATH and set JAVA_HOME, unless the installer does this for you.
-1. (Windows) <u>Git Bash</u> (from [Git for Windows](https://gitforwindows.org/) or GitHub Desktop), or some other bash emulator, to run bash scripts. **Run any script commands in the rest of this README from the emulator prompt, rather than CMD**.
-	* Terminal or application complaining about \r characters? [You need Unix line endings](https://help.github.com/en/articles/configuring-git-to-handle-line-endings) because shells don't like carriage return, so run `git config --global core.autocrlf input`. You may need to re-checkout after changing this setting.
+1. (Windows Only) The vast majority of local development setup scripts in this repository are written in bash. To work around this, use docker-compose to get a bash session: `docker-compose run api bash`. The "api" configuration includes the JDK and mounts the project root under "app/" - scripts should be visible, and their output should persist. **Run any script commands in the rest of the Quickstart from this bash prompt, rather than directly in CMD or Powershell**. 
+        * You can try to use Git Bash (from [Git for Windows](https://gitforwindows.org/) or GitHub Desktop), or some other bash emulator, but certain interactive scripts may hang (keytool?).
+	* Terminal or application complaining about \r characters? See Prerequisite #1.
 
 Docker (Engine) version 18.09.8 is known to work;
 Docker Compose version 1.24.1 is known to work; docker-compose version 1.17.1 is known **not** to work.
@@ -37,7 +39,32 @@ You can check the installed versions with:
 docker --version
 docker-compose --version
 ```
+### Getting the code
 
+There are two primary ways to pull the code for a standalone backend - clone/download of this repository, and the XG tool.
+In both cases, if you're on Windows *make sure you followed the instructions about line endings above*. The XG tool will clone the repository under the hood, so the warning still applies.
+
+#### Clone or download this repository
+
+About as simple as it sounds, but you will need to customize artifact / directory names yourself.
+
+#### Using the "XG" Command-Line Interface (CLI)
+  - Download and setup the [XG Tool, also known as TCP CLI](https://github.com/excellaco/xg#installation):
+    this consists of a single binary which can be put in your PATH.
+  - Copy the `xg.yaml` file from this repository to where you will run the CLI (you do not need to clone the entire repository)
+  - Fill out the appropriate fields in `xg.yaml` with the desired values: (can quotes be used?)
+    - projectName (directory)
+    - ProjectName (for Gradle)
+    - GroupName (for Gradle; typically "com.excella")
+  - run `xg make`
+    - Note: Your `xg` must be 0.2.1 (7/23/19) or later; `xg version` will show the installed version.
+    - Note: if your private key for the tcp-java GitHub repo is not in `~/.ssh/id_rsa`, specify it with the '-i' or '--identity' flag:
+      `xg make -i ~/.ssh/my_github_key` .  Failure to provide the correct private key will result in the error message `Error: Unable to clone repository remote`.
+    - This will list a bunch of files and directories, prefixed with "F" for a file, "T" for a template, and "D" for a directory.
+    - The result is in a subdirectory whose name is the same as the projectName you specified in `xg.yaml`.  Here we assume it's called my-project.
+    - The result is *not* a Git workspace: there's no `.git` subdirectory.
+  - Work around minor current `xg` limitations:
+    - `cp -p xg.yaml my-project` # xg puts the version of xg.yaml as found in the repo under my-project
 
 ### Set up the application
 This project uses OAuth2 and JWT for authentication / authorization.
@@ -72,7 +99,24 @@ When the app is not running:
 * Auto-fix linter warnings (do this on the last commit before pushing!): `./start goJF`
 * Run linter + tests + test report: `./test` (coverage report is generated under `build/jacocoHtml/index.html`)
 
-##### 5  Use OAuth to interact with the API
+### Setting up IntelliJ
+
+- Install the Lombok Plugin
+
+    1. Go to `File > Settings > Plugins`.
+    2. Click on Browse repositories...
+    3. Search for Lombok Plugin.
+    4. Click on Install plugin.
+    5. Restart IntelliJ IDEA.
+    6. Ensure Annotation Processing is enabled `File > Settings > Build, Execution, Deployment > Compiler > Annotation Processors`. (IDEA may prompt you to do this)
+
+- Import the project
+    1. Select `Import Project`
+    2. Select the directory where you cloned the repository
+    3. Import as a gradle project and select a JDK >= 11
+    4. Select to use the gradle wrapper configuration from the project
+
+### Use OAuth to interact with the API (Cleanup TODO)
 
 There are two ways you can use OAuth to interact with the app's API from the command line:
 
@@ -114,25 +158,7 @@ Then you can call curl more concisely:
 `curl localhost:8080/api/employee/2 -K token`
 
 
-##### 6. Set up IntelliJ
-
-- Install the Lombok Plugin
-
-    1. Go to `File > Settings > Plugins`.
-    2. Click on Browse repositories...
-    3. Search for Lombok Plugin.
-    4. Click on Install plugin.
-    5. Restart IntelliJ IDEA.
-
-- Import the project
-    1. Select `Import Project`
-    2. Select the directory where you cloned the repository
-    3. Import as a gradle project and select a JDK >= 11
-    4. Select to use the gradle wrapper configuration from the project
-
-
-
-##### 7. Tech Challenge Architecture
+### Tech Challenge Architecture
 
 The Java repository represents one of the possible backends that can be used.
 
@@ -140,34 +166,10 @@ The Java repository represents one of the possible backends that can be used.
 
 To connect a front-end application to the API, please see either the Angular or React tech challenge repositories.
 
-  -  [Angular Repository](https://github.com/excellaco/tcp-angular)
+  - [Angular Repository](https://github.com/excellaco/tcp-angular)
   - [React Repository](https://github.com/excellaco/tcp-react)
 
-##### 8.  Reactive Web Frameworks
-
-[Springboot Webflux](https://spring.io/guides/gs/reactive-rest-service/) is a reactive web framework.  For more information on reactive design and its basic principles, we suggest looking at the [Reactive Manifesto](https://www.reactivemanifesto.org/).
-
-For a more detailed guide to understanding how to handle reactive and functional types like `Mono` and `Flux`, please refer to our [Java React Tutorial](https://github.com/excellalabs/reactive-in-java)
-
-##### Using the Command-Line Interface (CLI)
-  - Download and setup the [TCP CLI](https://github.com/excellaco/xg#installation):
-    this consists of a single binary which can be put in your PATH.
-  - Copy the `xg.yaml` file from this repository to where you will run the CLI (you do not need to clone the entire repository)
-  - Fill out the appropriate fields in `xg.yaml` with the desired values: (can quotes be used?)
-    - projectName (directory)
-    - ProjectName (for Gradle)
-    - GroupName (for Gradle; typically "com.excella")
-  - run `xg make`
-    - Note: Your `xg` must be 0.2.1 (7/23/19) or later; `xg version` will show the installed version.
-    - Note: if your private key for the tcp-java GitHub repo is not in `~/.ssh/id_rsa`, specify it with the '-i' or '--identity' flag:
-      `xg make -i ~/.ssh/my_github_key` .  Failure to provide the correct private key will result in the error message `Error: Unable to clone repository remote`.
-    - This will list a bunch of files and directories, prefixed with "F" for a file, "T" for a template, and "D" for a directory.
-    - The result is in a subdirectory whose name is the same as the projectName you specified in `xg.yaml`.  Here we assume it's called my-project.
-    - The result is *not* a Git workspace: there's no `.git` subdirectory.
-  - Work around minor current `xg` limitations:
-    - `cp -p xg.yaml my-project` # xg puts the version of xg.yaml as found in the repo under my-project
-
-##### 9. Deployment to the ECS Cluster
+### Deployment to the ECS Cluster (Deprecated - TODO)
 
 To deploy to the ECS cluster, you need to
 build the production Docker image, push it to the ECR,
@@ -278,3 +280,11 @@ use ecs-cli to create and bring up the service, and open ports in the load balan
     `./get-token localhost:8080`
     `curl -K token localhost:8080/api/employee/2`
     If this succeeds, the problem is probably with the networking (ALB, Target Groups, Security Groups).
+    
+### Suggested Reading
+
+#### Reactive Web Frameworks
+
+[WebFlux](https://spring.io/guides/gs/reactive-rest-service/) is a reactive web framework for Spring. For more information on reactive design and its basic principles, we suggest looking at the [Reactive Manifesto](https://www.reactivemanifesto.org/).
+
+For a more detailed guide to understanding how to handle reactive and functional types like `Mono` and `Flux`, please refer to our [Java Reactive Tutorial](https://github.com/excellalabs/reactive-in-java)
