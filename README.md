@@ -27,7 +27,8 @@ For local development, you will need:
     * Mac (Homebrew): `brew cask install java`
     * Windows:  It's simplest just to install the [latest JDK](https://www.oracle.com/technetwork/java/javase/downloads/index.html) from Oracle, rather than try something fancy. You may need to edit the system environment variables to add the binary folder to PATH and set JAVA_HOME, unless the installer does this for you.
 1. (Windows Only) The vast majority of local development setup scripts in this repository are written in bash. To work around this, use docker-compose to get a bash session: `docker-compose run api bash`. The "api" configuration includes the JDK and mounts the project root under "app/" - scripts should be visible, and their output should persist. **Run any script commands in the rest of the Quickstart from this bash prompt, rather than directly in CMD or Powershell**. 
-        * You can try to use Git Bash (from [Git for Windows](https://gitforwindows.org/) or GitHub Desktop), or some other bash emulator, but certain interactive scripts may hang (keytool?).
+        
+	* You can try to use Git Bash (from [Git for Windows](https://gitforwindows.org/) or GitHub Desktop), or some other bash emulator, but certain interactive scripts may hang (keytool?).
 	* Terminal or application complaining about \r characters? See Prerequisite #1.
 
 Docker (Engine) version 18.09.8 is known to work;
@@ -42,7 +43,7 @@ docker-compose --version
 ### Getting the code
 
 There are two primary ways to pull the code for a standalone backend - clone/download of this repository, and the XG tool.
-In both cases, if you're on Windows *make sure you followed the instructions about line endings above*. The XG tool will clone the repository under the hood, so the warning still applies.
+In both cases, if you're on Windows *make sure you followed the [instructions](#prerequisites) about line endings above*. The XG tool will clone the repository under the hood, so the warning still applies.
 
 #### Clone or download this repository
 
@@ -84,7 +85,7 @@ It will create an .env file, then run `keytool`, which will ask you a bunch of q
 1. Compile the app: `./start clean build`
     * Note: if a script gives permission denied, you may need to run `chmod a+x script_name`
     * Note: if the build fails on the format check, run this and then try again: `./start goJF`. If this is a fresh checkout, go yell at whoever merged the format violations to master.
-    * Note: if you get a lot of FileNotFoundException test failures, double check that you ran the `generate-keystore` script. There should be a .env file in the app's root directory and a *.jks file in `src/main/resources`
+    * Note: if you get a lot of FileNotFoundException test failures, double check that you ran the `generate-keystore` script. There should be a .env file in the app's root directory and a \*.jks file in `src/main/resources`
 1. Run the application: `./start bootrun`
 1. Navigate to: 
 	> http://localhost:8080/api/swagger-ui.html
@@ -169,7 +170,7 @@ To connect a front-end application to the API, please see either the Angular or 
   - [Angular Repository](https://github.com/excellaco/tcp-angular)
   - [React Repository](https://github.com/excellaco/tcp-react)
 
-### Deployment to the ECS Cluster (Deprecated - TODO)
+### Deployment to the ECS Cluster (Deprecated by Terraform / scripts? - TODO)
 
 To deploy to the ECS cluster, you need to
 build the production Docker image, push it to the ECR,
