@@ -54,7 +54,7 @@ Windows users - as in the Quickstart, you should use Git Bash.
 There are two primary ways to pull the code for a standalone backend - a clone of this repository, and the XG tool.
 In both cases, if you're on Windows *make sure you followed the [instructions](#prerequisites) about line endings above*. The XG tool may clone the repository under the hood, so the warning still applies.
 
-#### Clone or download this repository
+#### Clone this repository
 
 `git clone git@github.com:excellaco/tcp-java.git` 
 
