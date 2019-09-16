@@ -11,16 +11,14 @@
 
 # Fail on any error; unset variables are errors; show commands before executing:
 set -eux
-ENV="$1"
+PROJECT="$1"
+ENV="$2"
 # TODO: see if logging anything from this script would be helpful
 
 # TODO: make sure we're in the correct directory (with ECS docker-compose.yml in it)
 # Can just check for Dockerfile, and cd .. if not there
 
 date
-
-# TODO: use generated variables file in this directory instead
-PROJECT=$(sed -ne "s/rootProject.name = '\([^']*\)'/\1/p" ../settings.gradle)
 
 echo "Running in $PWD"
 echo "Project = $PROJECT"
