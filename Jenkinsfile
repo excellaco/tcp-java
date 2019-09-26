@@ -27,6 +27,7 @@ pipeline {
         stage('Linter') {
             steps {
               gradlew('verGJF')
+              echo "${JOB_BASE_NAME}"
             }
         }
         stage('Clean') {
