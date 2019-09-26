@@ -12,3 +12,4 @@ build
 reactor.iml
 *.ipr
 *.iws
+*~

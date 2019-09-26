@@ -1,0 +1,48 @@
+#!/bin/bash
+
+# Create the Docker image for the tcp-java service.
+# All actions are local to the VM; does not use aws or ecs-cli.
+# Should be run before deploy-to-ecs is run.
+
+# Fail on any error; unset variables are errors; show commands before executing:
+set -eux
+ENV="$1"
+# TODO: see if logging anything from this script would be helpful
+
+# TODO: make sure we're in the correct (root) directory
+# Can just check for Dockerfile, and cd .. if not there
+
+date
+
+echo "Running in $PWD"
+echo "Target Environment = $ENV"
+
+docker --version
+ls -al Docker* generate-keystore
+
+password=$(echo -n "fpnggretbevrf" | tr '[a-mn-zA-MN-Z]' '[n-za-mN-ZA-M]')
+# TODO: figure out how secure the keystore password needs to be, and how to get it
+
+echo "Generating the keystore and .env file..."
+cat <<EOF > gk-input
+keystore
+$password
+Nobody
+DevOps
+Excella
+Arlington
+VA
+US
+yes
+EOF
+
+./generate-keystore < gk-input && rm gk-input
+
+cp -p .env tcp-java-ecs/
+
+echo "Building the tcp-java-api Docker image..."
+# TODO: may need sudo, or to run this script as sudo?
+docker build -t tcp-java-api:latest .
+
+echo "Checking for the Docker image..."
+docker image ls | grep tcp-java-api
