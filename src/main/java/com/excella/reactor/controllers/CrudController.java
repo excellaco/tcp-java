@@ -7,6 +7,7 @@ import javax.validation.groups.Default;
 import lombok.extern.slf4j.Slf4j;
 import org.reactivestreams.Publisher;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -24,7 +25,7 @@ public abstract class CrudController<T extends DomainModel> {
    * @return Publisher of all resources of type T
    */
   @GetMapping(value = "", name = "Get all of resource", produces = "application/json")
-  Publisher<T> getAll(Pageable pageable) {
+  Publisher<T> getAll(@PageableDefault(Integer.MAX_VALUE) Pageable pageable) {
     return getService().all(pageable).doOnSubscribe(result -> log.info("Getting all"));
   }
 
