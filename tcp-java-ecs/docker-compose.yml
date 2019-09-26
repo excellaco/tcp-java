@@ -1,31 +1,34 @@
 version: "3.0"
 services:
   api:
-    image: openjdk:11
-    container_name: api
-    stdin_open: true
-    volumes:
-      - .:/app
-      - gradle_cache:/root/.gradle
+    image: 090999229429.dkr.ecr.us-east-1.amazonaws.com/tcp-java-api
+#    unsup: container_name: api
+#    unsup: stdin_open: true
+#    volumes:
+#      - .:/app
+#      - gradle_cache:/root/.gradle
     ports:
       - "8080:8080"
       - "5005:5005"
+    links: [ "db:db" ]
     environment:
       DB_HOST: db
       DB_PORT: 5432
       DB_USER: api_user
       DB_PASSWORD: api_password
+      # who substitutes these in? docker-compose? will ecs-cli compose do that?
       JWT_KEY_STORE: ${JWT_KEY_STORE}
       JWT_KEY_STORE_PASS: ${JWT_KEY_STORE_PASS}
       JWT_KEYPAIR_ALIAS: ${JWT_KEYPAIR_ALIAS}
       JWT_KEYPAIR_PASS: ${JWT_KEYPAIR_PASS}
-    depends_on:
-      - db
+#    unsup: depends_on:
+#      - db
     working_dir: /app
-    command: ["/app/gradlew", "bootRun"]
+#    command: ["/app/gradlew", "bootRun"]
   db:
     image: postgres:11.3
-    container_name: postgres
+#    container_name: postgres
+    hostname: db
     environment:
       PGDATA: /var/lib/postgresql/data/case_data
       POSTGRES_USER: api_user
@@ -36,4 +39,3 @@ services:
       - "5440:5432"
 volumes:
   postgres_db:
-  gradle_cache:

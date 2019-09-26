@@ -9,3 +9,4 @@ build
 .java-version
 *.jks
 .scannerwork/
+*~
