@@ -68,6 +68,9 @@ pipeline {
           }
         }
         stage('Deploy Dev Image'){
+          when {
+            not { expression { env.PROJECT_NAME.startsWith('prd') } }
+          }
           steps{
             dir('tcp-java-ecs'){
               sh "./deploy-to-ecs ${PROJECT_NAME} dev"
