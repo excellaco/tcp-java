@@ -18,7 +18,7 @@ pipeline {
     stages {
         stage('SlackNotify'){
           when {
-            expression { JOB_BASE_NAME ==~ /(PR-)/ }
+            expression { env.JOB_BASE_NAME.startsWith('PR') }
           }
           steps {
             slackSend(channel: '#tcp-java', color: '#FFFF00', message: ":jenkins-triggered: Build Triggered - ${env.JOB_NAME} ${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>)")
