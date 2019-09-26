@@ -16,10 +16,18 @@ pipeline {
         jdk "11"
     }
     stages {
+        stage('SlackNotify'){
+          when {
+            expression { env.JOB_BASE_NAME.startsWith('PR') }
+          }
+          steps {
+            slackSend(channel: '#tcp-java', color: '#FFFF00', message: ":jenkins-triggered: Build Triggered - ${env.JOB_NAME} ${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>)")
+          }
+        }
         stage('Linter') {
             steps {
-              slackSend(channel: '#tcp-java', color: '#FFFF00', message: ":jenkins-triggered: Build Triggered - ${env.JOB_NAME} ${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>)")
               gradlew('verGJF')
+              echo "${JOB_BASE_NAME}"
             }
         }
         stage('Clean') {
@@ -60,9 +68,12 @@ pipeline {
           }
         }
         stage('Deploy Dev Image'){
+          when {
+            not { expression { env.PROJECT_NAME.startsWith('prd') } }
+          }
           steps{
             dir('tcp-java-ecs'){
-              sh './deploy-to-ecs dev'
+              sh "./deploy-to-ecs ${PROJECT_NAME} dev"
             }
           }
         }
@@ -74,7 +85,7 @@ pipeline {
         stage('Deploy Test Image'){
           steps{
             dir('tcp-java-ecs'){
-              sh './deploy-to-ecs test'
+              sh "./deploy-to-ecs ${PROJECT_NAME} test"
             }
           }
         }
@@ -86,7 +97,7 @@ pipeline {
         stage('Deploy Prod Image'){
           steps{
             dir('tcp-java-ecs'){
-              sh './deploy-to-ecs prod'
+              sh "./deploy-to-ecs ${PROJECT_NAME} prod"
             }
           }
         } */
@@ -94,11 +105,18 @@ pipeline {
     post {
         success {
            setBuildStatus("Build succeeded", "SUCCESS");
-           slackSend(channel: '#tcp-java', color: '#00FF00', message: ":jenkins_ci: Build Successful!  ${env.JOB_NAME} ${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>) :jenkins_ci:")
+           script {
+             if (env.JOB_BASE_NAME.startsWith('PR'))
+              slackSend(channel: '#tcp-java', color: '#00FF00', message: ":jenkins_ci: Build Successful!  ${env.JOB_NAME} ${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>) :jenkins_ci:")
+            }
+           cleanWs()
         }
         failure {
            setBuildStatus("Build failed", "FAILURE");
-           slackSend(channel: '#tcp-java', color: '#FF0000', message: ":alert: :jenkins_exploding: *Build Failed!  WHO BROKE THE FREAKING CODE??* ${env.JOB_NAME} ${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>) :jenkins_exploding: :alert:")
+           script {
+             if (env.JOB_BASE_NAME.startsWith('PR'))
+              slackSend(channel: '#tcp-java', color: '#FF0000', message: ":alert: :jenkins_exploding: *Build Failed!  Please remedy this malbuildage at your earliest convenience* ${env.JOB_NAME} ${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>) :jenkins_exploding: :alert:")
+            }
         }
     }
 }
