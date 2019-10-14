@@ -13,3 +13,5 @@ reactor.iml
 *.ipr
 *.iws
 *~
+\#*
+\.#*
