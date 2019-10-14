@@ -6,7 +6,8 @@
 
 # Fail on any error; unset variables are errors; show commands before executing:
 set -eux
-ENV="$1"
+PROJECT="$1"
+ENV="$2"
 # TODO: see if logging anything from this script would be helpful
 
 # TODO: make sure we're in the correct (root) directory
@@ -15,6 +16,7 @@ ENV="$1"
 date
 
 echo "Running in $PWD"
+echo "Project = $PROJECT"
 echo "Target Environment = $ENV"
 
 docker --version
@@ -41,7 +43,10 @@ EOF
 cp -p .env tcp-java-ecs/
 
 # Add DB values to .env :
-DB_ENDPOINT=$(terraform output rds_endpoint)
+aws_region=$(curl -s http://169.254.169.254/latest/meta-data/placement/availability-zone | sed "s/[a-z]$//")
+DB_ENDPOINT=$(aws ssm get-parameter --region $aws_region --name "/$PROJECT/$ENV/rds/endpoint" --query "Parameter.Value" --out text)
+
+# Split at : into HOST and PORT:
 read DB_HOST DB_PORT <<<$(IFS=":"; echo $DB_ENDPOINT)
 
 cat >> tcp-java-ecs/.env <<EOF

@@ -82,7 +82,7 @@ pipeline {
         }
         stage('Build Dev Image'){
           steps{
-              sh './tcp-java-ecs/package-for-ecs dev'
+              sh './tcp-java-ecs/package-for-ecs ${PROJECT_NAME} dev'
           }
         }
         stage('Deploy Dev Image'){
@@ -97,7 +97,7 @@ pipeline {
         }
         /* stage('Build Test Image'){
           steps{
-              sh './tcp-java-ecs/package-for-ecs test'
+              sh './tcp-java-ecs/package-for-ecs ${PROJECT_NAME} test'
           }
         }
         stage('Deploy Test Image'){
@@ -109,7 +109,7 @@ pipeline {
         }
         stage('Build Prod Image'){
           steps{
-              sh './tcp-java-ecs/package-for-ecs prod'
+              sh './tcp-java-ecs/package-for-ecs ${PROJECT_NAME} prod'
           }
         }
         stage('Deploy Prod Image'){
