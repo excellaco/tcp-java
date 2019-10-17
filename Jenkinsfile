@@ -82,7 +82,7 @@ pipeline {
         }
         stage('Build Dev Image'){
           steps{
-              sh './tcp-java-ecs/package-for-ecs ${PROJECT_NAME} dev'
+              sh './tcp-java-ecs/package-for-ecs ${PROJECT_NAME} dev ${AWS_REGION}'
           }
         }
         stage('Deploy Dev Image'){
@@ -91,31 +91,31 @@ pipeline {
           }
           steps{
             dir('tcp-java-ecs'){
-              sh "./deploy-to-ecs ${PROJECT_NAME} dev"
+              sh "./deploy-to-ecs ${PROJECT_NAME} dev ${AWS_REGION}"
             }
           }
         }
         /* stage('Build Test Image'){
           steps{
-              sh './tcp-java-ecs/package-for-ecs ${PROJECT_NAME} test'
+              sh './tcp-java-ecs/package-for-ecs ${PROJECT_NAME} test ${AWS_REGION}'
           }
         }
         stage('Deploy Test Image'){
           steps{
             dir('tcp-java-ecs'){
-              sh "./deploy-to-ecs ${PROJECT_NAME} test"
+              sh "./deploy-to-ecs ${PROJECT_NAME} test ${AWS_REGION}"
             }
           }
         }
         stage('Build Prod Image'){
           steps{
-              sh './tcp-java-ecs/package-for-ecs ${PROJECT_NAME} prod'
+              sh './tcp-java-ecs/package-for-ecs ${PROJECT_NAME} prod ${AWS_REGION}'
           }
         }
         stage('Deploy Prod Image'){
           steps{
             dir('tcp-java-ecs'){
-              sh "./deploy-to-ecs ${PROJECT_NAME} prod"
+              sh "./deploy-to-ecs ${PROJECT_NAME} prod ${AWS_REGION}"
             }
           }
         } */

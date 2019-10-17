@@ -8,6 +8,8 @@
 set -eux
 PROJECT="$1"
 ENV="$2"
+aws_region="$3"
+
 # TODO: see if logging anything from this script would be helpful
 
 # TODO: make sure we're in the correct (root) directory
@@ -43,15 +45,19 @@ EOF
 cp -p .env tcp-java-ecs/
 
 # Add DB values to .env :
-aws_region=$(curl -s http://169.254.169.254/latest/meta-data/placement/availability-zone | sed "s/[a-z]$//")
+DB_USER=$(aws ssm get-parameter --region $aws_region --name "/$PROJECT/$ENV/rds/username" --with-decryption --query "Parameter.Value" --out text)
+DB_PASSWORD=$(aws ssm get-parameter --region $aws_region --name "/$PROJECT/$ENV/rds/password" --with-decryption --query "Parameter.Value" --out text)
 DB_ENDPOINT=$(aws ssm get-parameter --region $aws_region --name "/$PROJECT/$ENV/rds/endpoint" --query "Parameter.Value" --out text)
 
 # Split at : into HOST and PORT:
 read DB_HOST DB_PORT <<<$(IFS=":"; echo $DB_ENDPOINT)
 
+# Note: do NOT use double-quotes around the values; bash isn't interpreting .env: ecs-cli compose is, and it does not drop quotes.
 cat >> tcp-java-ecs/.env <<EOF
-DB_HOST="${DB_HOST}"
-DB_PORT="${DB_PORT}"
+DB_HOST=${DB_HOST}
+DB_PORT=${DB_PORT}
+DB_USER=${DB_USER}
+DB_PASSWORD=${DB_PASSWORD}
 EOF
 
 echo "Building the tcp-java-api Docker image..."

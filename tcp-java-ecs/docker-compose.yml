@@ -5,13 +5,12 @@ services:
     ports:
       - "8080:8080"
       - "5005:5005"
-    links: [ "db:db" ]
     environment:
+      # ecs-cli compose substitutes these in, from .env in this directory:
       DB_HOST: ${DB_HOST}
       DB_PORT: ${DB_PORT}
-      DB_USER: api_user
-      DB_PASSWORD: api_password
-      # who substitutes these in? docker-compose? will ecs-cli compose do that?
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
       JWT_KEY_STORE: ${JWT_KEY_STORE}
       JWT_KEY_STORE_PASS: ${JWT_KEY_STORE_PASS}
       JWT_KEYPAIR_ALIAS: ${JWT_KEYPAIR_ALIAS}
