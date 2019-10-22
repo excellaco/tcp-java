@@ -39,7 +39,7 @@ docker-compose --version
 1. Run `docker-compose run api bash`. Use this bash prompt for the next step.
 1. Run `./generate-keystore`. It doesn't really matter what information you enter here.
 1. Run `exit` once to drop out of the docker container.
-1. Run `./start bootrun` and wait for the backend to start up
+1. Run `./start bootrun` and wait for the backend to start up (`75% EXECUTING` will display when it is up and running)
 1. Go to http://localhost:8080/api/swagger-ui.html to see interactive API documentation.
 1. Before you perform requests from Swagger, click the small lock icon and enter `user` / `pass`. 
 
@@ -111,7 +111,7 @@ It will then create an .env file for you, then run `keytool` behind the scenes. 
     * Note: if a script gives permission denied, you may need to run `chmod a+x script_name`
     * Note: if the build fails on the format check, run this and then try again: `./start goJF`. If this is a fresh checkout, go yell at whoever merged the format violations to master.
     * Note: if you get a lot of FileNotFoundException test failures, double check that you ran the `generate-keystore` script. There should be a .env file in the app's root directory and a \*.jks file in `src/main/resources`
-1. Run the application: `./start bootrun`
+1. Run the application: `./start bootrun`  (`75% EXECUTING` will display when it is up and running)
 1. Navigate to: 
 	> http://localhost:8080/api/swagger-ui.html
 1. Click the lock button to pop up a login prompt. The default credentials are `user` / `pass` .
