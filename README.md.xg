@@ -99,7 +99,7 @@ Also, please ensure Flyway migrations are running. They include the DB setup for
   - Note: if the build fails on the format check, run this and then try again: `./start goJF`
   - Note: if you get a lot of FileNotFoundException test failures, check that your keystore (`.jks`) file is in the CLASSPATH and is readable
 
-- Run the application: `./start bootrun`
+- Run the application: `./start bootrun`  (`75% EXECUTING` will display when it is up and running)
 
 - Navigate to:
     > http://localhost:8080/api/swagger-ui.html
