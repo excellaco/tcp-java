@@ -1,2 +1,4 @@
-docker-compose run -p 8080:8080 api /app/gradlew verGJF clean testNG jacocoTestReport jacocoTestCoverageVerification 
+#!/bin/bash
+
+docker-compose run --service-ports api /app/gradlew verGJF clean testNG jacocoTestReport jacocoTestCoverageVerification
 

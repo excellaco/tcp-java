@@ -1,2 +1,4 @@
-docker-compose run -p 5005:5005 -p 8080:8080 api ./gradlew $@
+#!/bin/bash
+
+docker-compose run --service-ports api ./gradlew $@
 

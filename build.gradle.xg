@@ -1,5 +1,5 @@
 plugins {
-	id 'org.springframework.boot' version '2.1.5.RELEASE'
+	id 'org.springframework.boot' version '2.2.0.RELEASE'
 	id "io.franzbecker.gradle-lombok" version '3.0.0'
 	id 'com.github.sherter.google-java-format' version '0.8'
 	id 'jacoco'
@@ -37,7 +37,7 @@ jacocoTestReport {
 	}
 
 	afterEvaluate {
-		classDirectories = files(classDirectories.files.collect {
+		classDirectories.setFrom files(classDirectories.files.collect {
 			fileTree(dir: it, exclude: ['com/excella/reactor/config/**', 'com/excella/reactor/ReactorApplication.class', 'com/excella/reactor/common/reactor/MonoUtils.class'])
 		})
 	}

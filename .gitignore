@@ -5,6 +5,7 @@ build
 *.iml
 .DS_Store
 .env
+.env.bak
 .envrc
 .java-version
 *.jks
