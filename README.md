@@ -1,4 +1,4 @@
-[![Build Status](https://prd-tcp-jenkins.excellalabs.com/buildStatus/icon?job=TCP%2FJava%2Ftcp-java%2Fmaster)](https://prd-tcp-jenkins.excellalabs.com/job/TCP/job/Java/job/tcp-java/job/master/)
+[![Build Status](https://core-tcp-jenkins.excellalabs.com/buildStatus/icon?job=CORE-TCP%2Ftcp-java%2Fmaster)](https://core-tcp-jenkins.excellalabs.com/job/CORE-TCP/job/tcp-java/job/master/)
 [![Coverage](http://sonarqube.excellalabs.com:9000/api/project_badges/measure?project=tcp-java&metric=coverage)](http://sonarqube.excellalabs.com:9000/dashboard?id=tcp-java)
 [![Vulnerabilities](http://sonarqube.excellalabs.com:9000/api/project_badges/measure?project=tcp-java&metric=vulnerabilities)](http://sonarqube.excellalabs.com:9000/dashboard?id=tcp-java)
 
@@ -20,7 +20,7 @@ For local development, you will need:
     * Linux: Install the latest OpenJDK package using your distro's package manager. Add the installed binary folder to your PATH and set JAVA_HOME, replacing references to any older JDKs, if the package didn't do it for you.
     * Mac (Homebrew): `brew cask install java`
     * Windows:  Install the [latest JDK](https://www.oracle.com/technetwork/java/javase/downloads/index.html). Edit the system environment variables to add the binary folder to PATH and set JAVA_HOME, unless the installer does this for you.
-        
+
 
 Docker (Engine) version 18.09.8 is known to work;
 docker-compose version 1.24.1 is known to work; docker-compose version 1.17.1 is known **not** to work.
@@ -41,7 +41,7 @@ docker-compose --version
 1. Run `exit` once to drop out of the docker container.
 1. Run `./start bootrun` and wait for the backend to start up (`75% EXECUTING` will display when it is up and running)
 1. Go to http://localhost:8080/api/swagger-ui.html to see interactive API documentation.
-1. Before you perform requests from Swagger, click the small lock icon and enter `user` / `pass`. 
+1. Before you perform requests from Swagger, click the small lock icon and enter `user` / `pass`.
 
 * Terminal or application complaining about \r characters? See the Windows warning under the Git prerequisite.
 
@@ -56,7 +56,7 @@ In both cases, if you're on Windows *make sure you followed the [instructions](#
 
 #### Clone this repository
 
-`git clone git@github.com:excellaco/tcp-java.git` 
+`git clone git@github.com:excellaco/tcp-java.git`
 
 #### Using the "XG" Command-Line Interface (CLI)
   - Download and setup the [XG Tool, also known as TCP CLI](https://github.com/excellaco/xg#installation):
@@ -112,7 +112,7 @@ It will then create an .env file for you, then run `keytool` behind the scenes. 
     * Note: if the build fails on the format check, run this and then try again: `./start goJF`. If this is a fresh checkout, go yell at whoever merged the format violations to master.
     * Note: if you get a lot of FileNotFoundException test failures, double check that you ran the `generate-keystore` script. There should be a .env file in the app's root directory and a \*.jks file in `src/main/resources`
 1. Run the application: `./start bootrun`  (`75% EXECUTING` will display when it is up and running)
-1. Navigate to: 
+1. Navigate to:
 	> http://localhost:8080/api/swagger-ui.html
 1. Click the lock button to pop up a login prompt. The default credentials are `user` / `pass` .
 
@@ -189,7 +189,7 @@ The Jenkinsfile deals with packaging the tcp-java-api application and deploying 
     `./get-token localhost:8080`
     `curl -K token localhost:8080/api/employee/2`
     If this succeeds, the problem is probably with the networking (ALB, Target Groups, Security Groups).
-    
+
 ### Suggested Reading
 
 #### Reactive Web Frameworks
