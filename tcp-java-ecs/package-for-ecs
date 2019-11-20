@@ -58,11 +58,12 @@ DB_HOST=${DB_HOST}
 DB_PORT=${DB_PORT}
 DB_USER=${DB_USER}
 DB_PASSWORD=${DB_PASSWORD}
+AWS_REGION=${aws_region}
 EOF
 
 echo "Building the tcp-java-api Docker image..."
 # TODO: may need sudo, or to run this script as sudo?
-docker build -t tcp-java-api:latest .
+docker build -t tcp-java-api:latest . -f tcp-java-ecs/Dockerfile
 
 echo "Checking for the Docker image..."
 docker image ls | grep tcp-java-api
