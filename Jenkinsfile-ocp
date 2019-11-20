@@ -1,0 +1,69 @@
+def appName = 'tcp-java'
+def DEV_ENV = 'development'
+def S2I_IMAGE = 'fabric8/s2i-java'
+def REPO_URL = 'https://github.com/excellaco/tcp-java'
+
+pipeline {
+    agent any
+    stages {
+        stage('Linter') {
+            steps {
+              gradlew('verGJF')
+              echo "${JOB_BASE_NAME}"
+            }
+        }
+        stage('Clean') {
+            steps {
+                gradlew('clean')
+            }
+        }
+        stage('Unit Tests') {
+            steps {
+                gradlew('testNG')
+            }
+            post{
+              always {
+                junit '**/build/test-results/testNG/TEST-*.xml'
+              }
+            }
+        }
+        stage('Jacoco') {
+            steps {
+                gradlew('jacocoTestReport')
+            }
+        }
+        stage('Jacoco Verficiation') {
+            steps {
+                gradlew('jacocoTestCoverageVerification')
+            }
+        }
+        stage('Create Dev Configs') {
+              when {
+                not {
+                  expression {
+                    openshift.withCluster() {
+                      openshift.withProject(DEV_ENV) {
+                        return openshift.selector("bc", appName).exists()
+                      }
+                    }
+                  }
+                }
+              }
+              steps {
+                script {
+                    openshift.withCluster() {
+                        openshift.withProject(DEV_ENV) {
+                          def app = openshift.newApp("${S2I_IMAGE}~${REPO_URL}", "--name='${appName}'", "--strategy=source")
+                          sleep 5
+                          def logs = app.narrow('bc').logs('-f')
+                        }
+                    }
+                }
+              }
+            }
+    }
+}
+
+def gradlew(String... args) {
+    sh "./gradlew ${args.join(' ')} -s"
+}
