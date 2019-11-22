@@ -4,7 +4,11 @@ def S2I_IMAGE = 'fabric8/s2i-java'
 def REPO_URL = 'https://github.com/excellaco/tcp-java'
 
 pipeline {
-    agent any
+    agent {
+      node {
+        label 'openjdk-11-rhel7'
+      }
+    }
     stages {
         stage('Linter') {
             steps {
