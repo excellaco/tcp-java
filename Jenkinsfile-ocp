@@ -6,7 +6,7 @@ def REPO_URL = 'https://github.com/excellaco/tcp-java'
 pipeline {
     agent {
       node {
-        label 'openjdk-11-rhel7'
+        label 'maven'
       }
     }
     stages {
@@ -58,13 +58,23 @@ pipeline {
                     openshift.withCluster() {
                         openshift.withProject(DEV_ENV) {
                           def app = openshift.newApp("${S2I_IMAGE}~${REPO_URL}", "--name='${appName}'", "--strategy=source")
-                          sleep 5
                           def logs = app.narrow('bc').logs('-f')
                         }
                     }
                 }
               }
             }
+        stage('Start Build') {
+          steps {
+            script {
+                openshift.withCluster() {
+                    openshift.withProject(DEV_ENV) {
+                        def buildSelector = openshift.startBuild(appName, "--follow").narrow('bc')
+                    }
+                }
+            }
+          }
+        }
     }
 }
 
