@@ -1,81 +1,84 @@
 def appName = 'tcp-java'
 def DEV_ENV = 'development'
-def S2I_IMAGE = 'fabric8/s2i-java'
+def S2I_IMAGE = 'fabric8/s2i-java:latest-java11'
 def REPO_URL = 'https://github.com/excellaco/tcp-java'
+def JDK_IMAGE = 'openjdk:11'
 
 pipeline {
-    agent {
-      node {
-        label 'maven'
+  agent {
+    docker {
+      image JDK_IMAGE
+    }
+  }
+  stages {
+    stage('Linter') {
+      steps {
+        gradlew('clean verGJF')
+        echo "${JOB_BASE_NAME}"
       }
     }
-    stages {
-        stage('Linter') {
-            steps {
-              gradlew('verGJF')
-              echo "${JOB_BASE_NAME}"
-            }
+
+    stage('Unit Tests') {
+      steps {
+        gradlew('testNG')
+      }
+      post{
+        always {
+          junit '**/build/test-results/testNG/TEST-*.xml'
         }
-        stage('Clean') {
-            steps {
-                gradlew('clean')
-            }
-        }
-        stage('Unit Tests') {
-            steps {
-                gradlew('testNG')
-            }
-            post{
-              always {
-                junit '**/build/test-results/testNG/TEST-*.xml'
+      }
+    }
+
+    stage('Jacoco') {
+      steps {
+        gradlew('jacocoTestReport')
+      }
+    }
+
+    stage('Jacoco Verficiation') {
+      steps {
+        gradlew('jacocoTestCoverageVerification')
+      }
+    }
+
+    stage('Create Dev Configs') {
+      agent any
+      when {
+        not {
+          expression {
+            openshift.withCluster() {
+              openshift.withProject(DEV_ENV) {
+                return openshift.selector("bc", appName).exists()
               }
-            }
-        }
-        stage('Jacoco') {
-            steps {
-                gradlew('jacocoTestReport')
-            }
-        }
-        stage('Jacoco Verficiation') {
-            steps {
-                gradlew('jacocoTestCoverageVerification')
-            }
-        }
-        stage('Create Dev Configs') {
-              when {
-                not {
-                  expression {
-                    openshift.withCluster() {
-                      openshift.withProject(DEV_ENV) {
-                        return openshift.selector("bc", appName).exists()
-                      }
-                    }
-                  }
-                }
-              }
-              steps {
-                script {
-                    openshift.withCluster() {
-                        openshift.withProject(DEV_ENV) {
-                          def app = openshift.newApp("${S2I_IMAGE}~${REPO_URL}", "--name='${appName}'", "--strategy=source")
-                          def logs = app.narrow('bc').logs('-f')
-                        }
-                    }
-                }
-              }
-            }
-        stage('Start Build') {
-          steps {
-            script {
-                openshift.withCluster() {
-                    openshift.withProject(DEV_ENV) {
-                        def buildSelector = openshift.startBuild(appName, "--follow").narrow('bc')
-                    }
-                }
             }
           }
         }
+      }
+      steps {
+        script {
+          openshift.withCluster() {
+            openshift.withProject(DEV_ENV) {
+              def app = openshift.newApp("${S2I_IMAGE}~${REPO_URL}", "--name='${appName}'", "--strategy=source")
+              def logs = app.narrow('bc').logs('-f')
+            }
+          }
+        }
+      }
     }
+
+    stage('Start Build') {
+      agent any
+      steps {
+        script {
+          openshift.withCluster() {
+            openshift.withProject(DEV_ENV) {
+              def buildSelector = openshift.startBuild(appName, "--follow").narrow('bc')
+            }
+          }
+        }
+      }
+    }
+  }
 }
 
 def gradlew(String... args) {
