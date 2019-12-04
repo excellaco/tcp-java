@@ -1,6 +1,6 @@
 FROM openjdk:11 AS builder
 
-RUN groupadd -g 600 api && useradd -r -u 600 -g appuser api
+RUN groupadd -g 600 api && useradd -r -u 600 -g ai api
 USER api
 
 WORKDIR /app
@@ -13,7 +13,7 @@ RUN . /app/export.env && ./gradlew --no-daemon --console plain clean build
 
 FROM openjdk:11
 
-RUN groupadd -g 600 api && useradd -r -u 600 -g appuser api
+RUN groupadd -g 600 api && useradd -r -u 600 -g ai api
 USER api
 
 WORKDIR /app
