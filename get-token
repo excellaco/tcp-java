@@ -27,4 +27,4 @@ echo -n $token_value >> token
 echo '"' >> token
 
 echo "OAuth token file created; you can use it like this:"
-echo "  curl ${base_url}/api/employee/7 -K token"
+echo "  alb=${base_url}; curl -K token \"\$alb/api/location/1\"; echo"
