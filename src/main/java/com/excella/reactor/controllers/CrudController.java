@@ -6,26 +6,26 @@ import com.excella.reactor.validation.groups.PostChecks;
 import javax.validation.groups.Default;
 import lombok.extern.slf4j.Slf4j;
 import org.reactivestreams.Publisher;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.web.PageableDefault;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.*;
 
 @Slf4j
 public abstract class CrudController<T extends DomainModel> {
+  protected final int defaultPageSize = 10;
+
   /**
    * gets all database objects of type T
    *
-   * @param pageable Pagination information
+   * @param page page number to retrieve
+   * @param size size of each page
    * @return Publisher of all resources of type T
    */
   @GetMapping(value = "", name = "Get all of resource", produces = "application/json")
-  Publisher<T> getAll(@PageableDefault(Integer.MAX_VALUE) Pageable pageable) {
+  Publisher<T> getAll(
+      @RequestParam(value = "page", required = false) Integer page,
+      @RequestParam(value = "size", required = false) Integer size) {
+    var pageable = PageRequest.of(page == null ? 0 : page, size == null ? defaultPageSize : size);
     return getService().all(pageable).doOnSubscribe(result -> log.info("Getting all"));
   }
 

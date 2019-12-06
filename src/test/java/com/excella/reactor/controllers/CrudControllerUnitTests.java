@@ -5,6 +5,7 @@ import com.excella.reactor.shared.SampleEntity;
 import java.util.Arrays;
 import org.mockito.ArgumentMatchers;
 import org.mockito.Mockito;
+import org.springframework.data.domain.Pageable;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -42,9 +43,9 @@ public class CrudControllerUnitTests {
 
   @Test
   private void getAll_can_return_flux_with_multiple_entities() {
-    Mockito.when(mockService.all(null))
+    Mockito.when(mockService.all(Mockito.any(Pageable.class)))
         .thenReturn(Flux.just(mockEntity1, mockEntity2, mockEntity3));
-    StepVerifier.create(testController.getAll(null))
+    StepVerifier.create(testController.getAll(0, 10))
         .expectNextSequence(Arrays.asList(mockEntity1, mockEntity2, mockEntity3))
         .expectComplete()
         .verify();
@@ -52,9 +53,9 @@ public class CrudControllerUnitTests {
 
   @Test
   private void getAll_can_return_empty_flux() {
-    Mockito.when(mockService.all(null)).thenReturn(Flux.empty());
+    Mockito.when(mockService.all(Mockito.any(Pageable.class))).thenReturn(Flux.empty());
 
-    StepVerifier.create(testController.getAll(null)).expectComplete().verify();
+    StepVerifier.create(testController.getAll(0, 10)).expectComplete().verify();
   }
 
   // .byId() returns an entity if one is found
