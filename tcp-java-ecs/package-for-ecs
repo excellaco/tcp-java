@@ -49,7 +49,7 @@ EOF
 
 ./generate-keystore < gk-input && rm gk-input
 
-cp -p .env tcp-java-ecs/
+cp -p .env $ECS_DIR/
 
 # Add DB values to .env :
 DB_USER=$(aws ssm get-parameter --region $aws_region --name "/$PROJECT/$ENV/rds/username" --with-decryption --query "Parameter.Value" --out text)
@@ -60,7 +60,7 @@ DB_ENDPOINT=$(aws ssm get-parameter --region $aws_region --name "/$PROJECT/$ENV/
 read DB_HOST DB_PORT <<<$(IFS=":"; echo $DB_ENDPOINT)
 
 # Note: do NOT use double-quotes around the values; bash isn't interpreting .env: ecs-cli compose is, and it does not drop quotes.
-cat >> tcp-java-ecs/.env <<EOF
+cat >> $ECS_DIR/.env <<EOF
 DB_HOST=${DB_HOST}
 DB_PORT=${DB_PORT}
 DB_USER=${DB_USER}
@@ -83,8 +83,10 @@ git log -1 > src/main/resources/commit
 
 echo "Building the $IMAGE_REPO Docker image..."
 # TODO: may need sudo, or to run this script as sudo?
-docker build -t $IMAGE_REPO:$GIT_COMMIT . -f tcp-java-ecs/Dockerfile
-# deploy script will look for $IMAGE_REPO:$GIT_COMMIT
+docker build -t $IMAGE_REPO:$GIT_COMMIT . -f $ECS_DIR/Dockerfile
+# deploy script will look for $IMAGE_REPO:$GIT_COMMIT *and* $IMAGE_REPO:latest
+# TODO: should we even be tagging it "latest" yet?
+docker tag $IMAGE_REPO:$GIT_COMMIT $IMAGE_REPO:latest
 
 echo "Checking for the Docker image..."
 docker image ls | grep $IMAGE_REPO
