@@ -37,7 +37,7 @@ docker-compose --version
 1. Clone this repository: `git clone git@github.com:excellaco/tcp-java.git`
 1. Open a terminal in the root of the cloned project. <u>Windows users should open a Git Bash</u>, which comes with Git for Windows and GitHub Desktop.
 1. Run `docker-compose run api bash`. Use this bash prompt for the next step.
-1. Run `./generate-keystore`. It doesn't really matter what information you enter here.
+1. Run `./generate-keystore`. It doesn't really matter what information you enter here as long as the fields are not left blank.
 1. Run `exit` once to drop out of the docker container.
 1. Run `./start bootrun` and wait for the backend to start up (`75% EXECUTING` will display when it is up and running)
 1. Go to http://localhost:8080/api/swagger-ui.html to see interactive API documentation.
