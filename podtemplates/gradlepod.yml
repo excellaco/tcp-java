@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: Pod
+spec:
+  containers:
+  - name: java11
+    image: gradle:jdk11
+    command: ['cat']
+    tty: true

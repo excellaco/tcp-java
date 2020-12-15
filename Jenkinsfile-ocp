@@ -1,26 +1,51 @@
 def appName = 'tcp-java'
 def DEV_ENV = 'development'
+def DEFAULT_ENV = 'default'
 def S2I_IMAGE = 'fabric8/s2i-java:latest-java11'
 def REPO_URL = 'https://github.com/excellaco/tcp-java'
-def JDK_IMAGE = 'openjdk:11'
+def AWS_PROVISIONING_SECRET = 'aws-provisioning-iam'
+
+def secret_data
 
 pipeline {
-  agent {
-    docker {
-      image JDK_IMAGE
-    }
-  }
+  agent none
   stages {
-    stage('Linter') {
+    stage('Terraform Resources') {
+      agent {
+        kubernetes {
+          label 'terraform-update'
+          cloud 'openshift'
+          defaultContainer 'terraform'
+          yamlFile 'podtemplates/terraformpod.yml'
+        }
+      }
       steps {
-        gradlew('clean verGJF')
-        echo "${JOB_BASE_NAME}"
+        script {
+          sh "terraform init tcp-java-ocp/terraform"
+          sh '''
+            echo $AWS_ACCESS_KEY_ID
+            echo $AWS_SECRET_ACCESS_KEY
+            terraform apply -auto-approve tcp-java-ocp/terraform
+          '''
+        }
       }
     }
-
     stage('Unit Tests') {
+      agent {
+        kubernetes {
+          label 'jdk11-testing'
+          cloud 'openshift'
+          defaultContainer 'java11'
+          yamlFile 'podtemplates/gradlepod.yml'
+        }
+      }
       steps {
-        gradlew('testNG')
+        container('java11') {
+          gradle('clean verGJF')
+          gradle('testNG')
+          gradle('jacocoTestReport')
+          gradle('jacocoTestCoverageVerification')
+        }
       }
       post{
         always {
@@ -28,29 +53,14 @@ pipeline {
         }
       }
     }
-
-    stage('Jacoco') {
-      steps {
-        gradlew('jacocoTestReport')
-      }
-    }
-
-    stage('Jacoco Verficiation') {
-      steps {
-        gradlew('jacocoTestCoverageVerification')
-      }
-    }
-
     stage('Create Dev Configs') {
-      agent any
+      agent {
+        label 'nodejs'
+      }
       when {
         not {
           expression {
-            openshift.withCluster() {
-              openshift.withProject(DEV_ENV) {
-                return openshift.selector("bc", appName).exists()
-              }
-            }
+            return doesBuildConfigExist(DEV_ENV, appName)
           }
         }
       }
@@ -67,12 +77,14 @@ pipeline {
     }
 
     stage('Start Build') {
-      agent any
+      agent {
+        label 'nodejs'
+      }
       steps {
         script {
           openshift.withCluster() {
             openshift.withProject(DEV_ENV) {
-              def buildSelector = openshift.startBuild(appName, "--follow").narrow('bc')
+              openshift.startBuild(appName, "--follow")
             }
           }
         }
@@ -81,6 +93,22 @@ pipeline {
   }
 }
 
-def gradlew(String... args) {
-    sh "./gradlew ${args.join(' ')} -s"
+def gradle(String... args) {
+    sh "gradle ${args.join(' ')} -s"
+}
+
+def getSecret(String namespace, String secretName) {
+  openshift.withCluster() {
+    openshift.withProject(namespace) {
+      return openshift.selector("secret", secretName).object().data
+    }
+  }
+}
+
+def doesBuildConfigExist(String namespace, String name) {
+  openshift.withCluster() {
+    openshift.withProject(namespace) {
+      return openshift.selector("bc", name).exists()
+    }
+  }
 }

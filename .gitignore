@@ -10,6 +10,7 @@ build
 .java-version
 *.jks
 .scannerwork/
+.terraform/
 reactor.iml
 *.ipr
 *.iws
